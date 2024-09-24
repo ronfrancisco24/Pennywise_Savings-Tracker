@@ -1,0 +1,241 @@
+import 'package:flutter/material.dart';
+import 'package:savings_2/sign_in.dart';
+import 'main.dart';
+
+class SignUpPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Color(0xffebedf0),
+      body: SafeArea(
+        child: Stack(children: [
+          CustomPaint(
+            painter: RightTrianglePainter(),
+            child: Container(),
+          ),
+          Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 80),
+                    child: Column(
+                      children: [
+                        Text(
+                          'COLLABORATIVE',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontFamily: 'HeyGotcha',
+                            foreground: Paint()
+                              ..style = PaintingStyle.stroke
+                              ..strokeWidth =
+                                  1 // Adjust the width of the outline
+                              ..color =
+                                  Color(0xff274293), // Color of the outline
+                          ),
+                        ),
+                        Text(
+                          'SAVINGS TRACKER',
+                          style: TextStyle(
+                              fontFamily: 'BebasNeue',
+                              fontSize: 60,
+                              color: Color(0xff274293)),
+                        ),
+                        Container(
+                          width: 350,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(width: 20),
+                              SizedBox(
+                                width: 150,
+                                height: 200,
+                                child: Image.asset('images/logo.png'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 60,
+                              ),
+                              Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            width: 350,
+                            child: TextField(
+                              // Email Text Field
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.email),
+                                hintText: 'Enter Email',
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(width: 5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Expanded(
+                          child: Container(
+                            width: 350,
+                            child: TextField(
+                              // Password Text Field
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.lock),
+                                hintText: 'Enter Password',
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(width: 5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Expanded(
+                          child: Container(
+                            width: 350,
+                            child: TextField(
+                              // Confirm Password Text Field
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.lock),
+                                hintText: 'Confirm Password',
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(width: 5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // Navigate to the SignInPage on button press
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignInPage(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 60,
+                            width: 300,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xff264193),
+                                  Color(0xff81bed4)
+                                ], // Define gradient colors
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(30), // Round corners
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Already have an account?'),
+                                TextButton(
+                                  onPressed: () {
+                                    // Navigate to the HomePage on button press
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SignInPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Sign In',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.facebook),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.computer),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          )
+        ]),
+      ),
+    );
+  }
+}
+
+class RightTrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..shader = LinearGradient(
+        colors: [Color(0xff274293), Colors.white], // Define the gradient colors
+        begin: Alignment.topLeft, // Starting point of the gradient
+        end: Alignment.bottomRight, // Ending point of the gradient
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+
+    Path path = Path();
+    path.moveTo(0, 300); // Start at top-left
+    path.lineTo(size.width * 1.5, size.height * 0.8); // Mid-right
+    path.lineTo(size.width, size.height * 0.8); // Extend to the right edge
+    path.lineTo(size.width, size.height); // Bottom-right
+    path.lineTo(0, size.height); // Bottom-left
+    path.close(); // Connect back to top-left
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}

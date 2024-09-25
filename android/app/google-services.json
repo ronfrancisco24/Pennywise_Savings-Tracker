@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "493083836170",
+    "project_id": "collaborative-savings-tr-5a6dc",
+    "storage_bucket": "collaborative-savings-tr-5a6dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493083836170:android:12a00711cc695a4db384f3",
+        "android_client_info": {
+          "package_name": "com.example.savings_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSkMJm4jFqePRkuh-zkYZYgCkF4WsCiO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

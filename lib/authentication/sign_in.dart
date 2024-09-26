@@ -1,8 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:savings_2/sign_in.dart';
-import 'main.dart';
+import 'package:savings_2/authentication/sign_up.dart';
+import 'package:savings_2/widgets/constants.dart';
+import '../screens/tracker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  final _auth = FirebaseAuth.instance;
+  // provides access to firebase authentication
+  final TextEditingController emailController = TextEditingController();
+
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<void> _loginUser() async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
+      print('Login Successful.');
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TrackerPage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login failed.'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,26 +89,28 @@ class SignUpPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Container(
-                          height: 50,
-                          width: double.infinity,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 60,
-                              ),
-                              Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ],
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Container(
+                            child: Row(
+                              children: [
+                                SizedBox(width: 80),
+                                Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         Expanded(
                           child: Container(
-                            width: 350,
+                            margin: EdgeInsets.only(top: 30),
+                            width: 300,
                             child: TextField(
+                              controller: emailController,
                               // Email Text Field
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.email),
@@ -87,12 +122,15 @@ class SignUpPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(
+                          height: 20,
+                        ),
                         Expanded(
                           child: Container(
-                            width: 350,
+                            width: 300,
                             child: TextField(
                               // Password Text Field
+                              controller: passwordController,
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.lock),
                                 hintText: 'Enter Password',
@@ -103,53 +141,25 @@ class SignUpPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Expanded(
-                          child: Container(
-                            width: 350,
-                            child: TextField(
-                              // Confirm Password Text Field
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.lock),
-                                hintText: 'Confirm Password',
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(width: 5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                         SizedBox(
-                          height: 20,
+                          height: 30,
                         ),
                         TextButton(
                           onPressed: () {
-                            // Navigate to the SignInPage on button press
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignInPage(),
-                              ),
-                            );
+                            // Navigate to the TrackerPage on button press
+                            _loginUser();
                           },
                           child: Container(
                             height: 60,
                             width: 300,
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color(0xff264193),
-                                  Color(0xff81bed4)
-                                ], // Define gradient colors
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                              gradient: kLinearGradient,
                               borderRadius:
                                   BorderRadius.circular(30), // Round corners
                             ),
                             child: Center(
                               child: Text(
-                                'Sign Up',
+                                'Sign In',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25,
@@ -164,19 +174,18 @@ class SignUpPage extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Already have an account?'),
+                                Text('Don’t have an account?'),
                                 TextButton(
                                   onPressed: () {
-                                    // Navigate to the HomePage on button press
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => SignInPage(),
+                                        builder: (context) => SignUpPage(),
                                       ),
                                     );
                                   },
                                   child: Text(
-                                    'Sign In',
+                                    'Sign up',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
@@ -203,7 +212,7 @@ class SignUpPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           )
         ]),

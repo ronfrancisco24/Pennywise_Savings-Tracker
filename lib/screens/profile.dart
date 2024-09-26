@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:savings_2/personal_information.dart';
-import 'main.dart';
-import 'widgets/constants.dart';
+import 'package:savings_2/screens/personal_information.dart';
+import 'home_page.dart';
+import '../widgets/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -366,12 +367,7 @@ class ProfilePage extends StatelessWidget {
                       child: Center(
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                            );
+                            FirebaseAuth.instance.signOut();
                           },
                           child: Text(
                             'Log Out',

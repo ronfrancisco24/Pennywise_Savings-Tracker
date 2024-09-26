@@ -1,14 +1,45 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:savings_2/sign_up.dart';
-import 'package:savings_2/widgets/constants.dart';
-import 'main.dart';
-import 'tracker.dart';
+import 'package:savings_2/authentication/sign_in.dart';
+import '../screens/home_page.dart';
 
-class SignInPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  // text controllers
+  final _auth = FirebaseAuth.instance; // provides access to firebase authentication
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPwController = TextEditingController();
+  // final _formKey = GlobalKey<FormState>(); // identifies form widgets and allows validation.
+
+  Future<void> _registerUser() async {
+    try {
+      UserCredential? userCredential =
+          await _auth.createUserWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Registration Successful.'),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Registration failed.'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: Color(0xffebedf0),
       body: SafeArea(
         child: Stack(children: [
@@ -31,8 +62,10 @@ class SignInPage extends StatelessWidget {
                             fontFamily: 'HeyGotcha',
                             foreground: Paint()
                               ..style = PaintingStyle.stroke
-                              ..strokeWidth = 1 // Adjust the width of the outline
-                              ..color = Color(0xff274293), // Color of the outline
+                              ..strokeWidth =
+                                  1 // Adjust the width of the outline
+                              ..color =
+                                  Color(0xff274293), // Color of the outline
                           ),
                         ),
                         Text(
@@ -56,45 +89,46 @@ class SignInPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: Container(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 80),
-                                Text(
-                                  'Sign In',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
+                        Container(
+                          height: 50,
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 60,
+                              ),
+                              Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(
                           child: Container(
-                            margin: EdgeInsets.only(top: 30),
-                            width: 300,
-                            child: TextField(
-                              // Email Text Field
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.email),
-                                hintText: 'Enter Email',
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(width: 5),
+                            width: 350,
+                            child: Form(
+                              child: TextField(
+                                controller: emailController,
+                                // Email Text Field
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.email),
+                                  hintText: 'Enter Email',
+                                  border: UnderlineInputBorder(
+                                    borderSide: BorderSide(width: 5),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
+                        SizedBox(height: 20),
                         Expanded(
                           child: Container(
-                            width: 300,
+                            width: 350,
                             child: TextField(
+                              controller: passwordController,
                               // Password Text Field
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.lock),
@@ -106,29 +140,52 @@ class SignInPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                        SizedBox(height: 20),
+                        Expanded(
+                          child: Container(
+                            width: 350,
+                            child: TextField(
+                              controller: confirmPwController,
+                              // Confirm Password Text Field
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.lock),
+                                hintText: 'Confirm Password',
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(width: 5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                         SizedBox(
-                          height: 30,
+                          height: 20,
                         ),
                         TextButton(
                           onPressed: () {
-                            // Navigate to the TrackerPage on button press
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TrackerPage(),
-                              ),
-                            );
+                            // Navigate to the SignInPage on button press
+                            _registerUser();
+                            print(emailController.text);
+                            print(passwordController.text);
+                            print(confirmPwController.text);
                           },
                           child: Container(
                             height: 60,
                             width: 300,
                             decoration: BoxDecoration(
-                              gradient: kLinearGradient,
-                              borderRadius: BorderRadius.circular(30), // Round corners
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xff264193),
+                                  Color(0xff81bed4)
+                                ], // Define gradient colors
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius:
+                                  BorderRadius.circular(30), // Round corners
                             ),
                             child: Center(
                               child: Text(
-                                'Sign In',
+                                'Sign Up',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25,
@@ -143,18 +200,19 @@ class SignInPage extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Don’t have an account?'),
+                                Text('Already have an account?'),
                                 TextButton(
                                   onPressed: () {
+                                    // Navigate to the HomePage on button press
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => SignUpPage(),
+                                        builder: (context) => SignInPage(),
                                       ),
                                     );
                                   },
                                   child: Text(
-                                    'Sign up',
+                                    'Sign In',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black),
@@ -181,7 +239,7 @@ class SignInPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
+              )
             ],
           )
         ]),

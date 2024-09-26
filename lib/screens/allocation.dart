@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
-import 'widgets/constants.dart';
+import '../widgets/constants.dart';
 
 class AllocationPage extends StatefulWidget {
   const AllocationPage({super.key});

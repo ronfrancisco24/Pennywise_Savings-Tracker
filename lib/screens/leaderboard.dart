@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:savings_2/tracker.dart';
-import 'main.dart';
+import 'package:savings_2/screens/tracker.dart';
+import 'home_page.dart';
 
 void main() {
   runApp (LeaderBoardPage());

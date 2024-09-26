@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
-import 'main.dart';
+import 'home_page.dart';
 import 'leaderboard.dart';
-import 'widgets/constants.dart';
+import '../widgets/constants.dart';
 import 'profile.dart';
 
 final expenses = [
@@ -43,7 +43,7 @@ class _TrackerPageState extends State<TrackerPage>
     )..addListener(() {
       setState(() {});
     });
-    controller.repeat(reverse: true);
+    controller.repeat(reverse: false);
   }
 
   @override

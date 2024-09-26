@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:savings_2/leaderboard.dart';
-import 'package:savings_2/profile.dart';
-import 'package:savings_2/tracker.dart';
+import 'package:savings_2/screens/leaderboard.dart';
+import 'package:savings_2/screens/profile.dart';
+import 'package:savings_2/screens/tracker.dart';
 
 // big container with gradient background
 

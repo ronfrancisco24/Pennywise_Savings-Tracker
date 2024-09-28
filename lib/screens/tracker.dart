@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savings_2/screens/allocation.dart';
 import 'package:savings_2/widgets/constants.dart';
 import 'home_page.dart';
 import 'leaderboard.dart';
@@ -178,7 +179,13 @@ class _TrackerPageState extends State<TrackerPage>
                         SizedBox(width: 10),
                         Expanded(
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AllocationPage()),
+                              );
+                            },
                             child: Container(
                               height: 50,
                               decoration: BoxDecoration(
@@ -258,7 +265,7 @@ class _TrackerPageState extends State<TrackerPage>
                                 ],
                               ),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Days Remaining',
@@ -270,19 +277,6 @@ class _TrackerPageState extends State<TrackerPage>
                                   ),
                                 ],
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Board Rank',
-                                    style: kNormalSansWhiteMini,
-                                  ),
-                                  Text(
-                                    '7th place',
-                                    style: kNormalSansWhiteSmall,
-                                  ),
-                                ],
-                              )
                             ],
                           ),
                         ],

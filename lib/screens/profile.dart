@@ -242,14 +242,7 @@ class ProfilePage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        // Need pa ng pages
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.all(1), // Reduce padding
-                        minimumSize: Size(150, 40), // Set the minimum size
-                      ),
+                    Container(
                       child: Row(
                         children: [
                           SizedBox(width: 25),
@@ -265,14 +258,7 @@ class ProfilePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        //Need pa ng pages
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.all(1), // Reduce padding
-                        minimumSize: Size(150, 40), // Set the minimum size
-                      ),
+                    Container(
                       child: Row(
                         children: [
                           SizedBox(width: 25),
@@ -288,14 +274,7 @@ class ProfilePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Need pa ng pages
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.all(1), // Reduce padding
-                        minimumSize: Size(150, 40), // Set the minimum size
-                      ),
+                    Container(
                       child: Row(
                         children: [
                           SizedBox(width: 25),
@@ -312,14 +291,7 @@ class ProfilePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Need pa ng pages
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.all(1), // Reduce padding
-                        minimumSize: Size(150, 40), // Set the minimum size
-                      ),
+                    Container(
                       child: Row(
                         children: [
                           SizedBox(width: 25),

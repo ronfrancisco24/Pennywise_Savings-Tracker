@@ -5,6 +5,7 @@ import 'home_page.dart';
 import 'leaderboard.dart';
 import '../widgets/constants.dart';
 import 'profile.dart';
+import 'package:savings_2/authentication/auth_service.dart';
 
 final expenses = [
   // Add more expenses here
@@ -26,8 +27,6 @@ final expenses = [
 ];
 
 class TrackerPage extends StatefulWidget {
-  const TrackerPage({super.key});
-
   @override
   State<TrackerPage> createState() => _TrackerPageState();
 }
@@ -35,6 +34,8 @@ class TrackerPage extends StatefulWidget {
 class _TrackerPageState extends State<TrackerPage>
     with TickerProviderStateMixin {
   late AnimationController controller;
+
+  final AuthService authService = AuthService();
 
   @override
   void initState() {
@@ -130,6 +131,7 @@ class _TrackerPageState extends State<TrackerPage>
 
   @override
   Widget build(BuildContext context) {
+    final username = authService.getUserName();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -144,7 +146,7 @@ class _TrackerPageState extends State<TrackerPage>
                 style: TextStyle(color: Colors.grey),
               ),
               Text(
-                'Aaron',
+                '${username}',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
               )

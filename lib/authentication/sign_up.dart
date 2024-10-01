@@ -10,17 +10,31 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   // text controllers
-  final _auth = FirebaseAuth.instance; // provides access to firebase authentication
+  final _auth =
+      FirebaseAuth.instance; // provides access to firebase authentication
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPwController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   // final _formKey = GlobalKey<FormState>(); // identifies form widgets and allows validation.
 
   Future<void> _registerUser() async {
+    if (passwordController.text != confirmPwController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Passwords do not match.'),
+        ),
+      );
+      return;
+    }
+
     try {
       UserCredential? userCredential =
           await _auth.createUserWithEmailAndPassword(
               email: emailController.text, password: passwordController.text);
+
+      await userCredential.user?.updateDisplayName(usernameController.text);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Registration Successful.'),
@@ -47,196 +61,208 @@ class _SignUpPageState extends State<SignUpPage> {
             painter: RightTrianglePainter(),
             child: Container(),
           ),
-          Column(
+          ListView(
             children: [
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 80),
-                    child: Column(
-                      children: [
-                        Text(
-                          'COLLABORATIVE',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontFamily: 'HeyGotcha',
-                            foreground: Paint()
-                              ..style = PaintingStyle.stroke
-                              ..strokeWidth =
-                                  1 // Adjust the width of the outline
-                              ..color =
-                                  Color(0xff274293), // Color of the outline
-                          ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 80),
+                  child: Column(
+                    children: [
+                      Text(
+                        'COLLABORATIVE',
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontFamily: 'HeyGotcha',
+                          foreground: Paint()
+                            ..style = PaintingStyle.stroke
+                            ..strokeWidth =
+                                1 // Adjust the width of the outline
+                            ..color =
+                                Color(0xff274293), // Color of the outline
                         ),
-                        Text(
-                          'SAVINGS TRACKER',
-                          style: TextStyle(
-                              fontFamily: 'BebasNeue',
-                              fontSize: 60,
-                              color: Color(0xff274293)),
-                        ),
-                        Container(
-                          width: 350,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(width: 20),
-                              SizedBox(
-                                width: 150,
-                                height: 200,
-                                child: Image.asset('images/logo.png'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 50,
-                          width: double.infinity,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 60,
-                              ),
-                              Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: 350,
-                            child: Form(
-                              child: TextField(
-                                controller: emailController,
-                                // Email Text Field
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.email),
-                                  hintText: 'Enter Email',
-                                  border: UnderlineInputBorder(
-                                    borderSide: BorderSide(width: 5),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Expanded(
-                          child: Container(
-                            width: 350,
-                            child: TextField(
-                              controller: passwordController,
-                              // Password Text Field
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.lock),
-                                hintText: 'Enter Password',
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(width: 5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Expanded(
-                          child: Container(
-                            width: 350,
-                            child: TextField(
-                              controller: confirmPwController,
-                              // Confirm Password Text Field
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.lock),
-                                hintText: 'Confirm Password',
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(width: 5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // Navigate to the SignInPage on button press
-                            _registerUser();
-                            print(emailController.text);
-                            print(passwordController.text);
-                            print(confirmPwController.text);
-                          },
-                          child: Container(
-                            height: 60,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color(0xff264193),
-                                  Color(0xff81bed4)
-                                ], // Define gradient colors
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius:
-                                  BorderRadius.circular(30), // Round corners
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Column(
+                      ),
+                      Text(
+                        'SAVINGS TRACKER',
+                        style: TextStyle(
+                            fontFamily: 'BebasNeue',
+                            fontSize: 60,
+                            color: Color(0xff274293)),
+                      ),
+                      Container(
+                        width: 350,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Already have an account?'),
-                                TextButton(
-                                  onPressed: () {
-                                    // Navigate to the HomePage on button press
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SignInPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'Sign In',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ],
+                            SizedBox(width: 20),
+                            SizedBox(
+                              width: 150,
+                              height: 200,
+                              child: Image.asset('images/logo.png'),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.facebook),
-                                ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.computer),
-                                ),
-                              ],
-                            )
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Container(
+                        height: 50,
+                        width: double.infinity,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 60,
+                            ),
+                            Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 350,
+                        child: Form(
+                          child: TextField(
+                            controller: usernameController,
+                            // Email Text Field
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.email),
+                              hintText: 'Enter Username',
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide(width: 5),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        width: 350,
+                        child: Form(
+                          child: TextField(
+                            controller: emailController,
+                            // Email Text Field
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.email),
+                              hintText: 'Enter Email',
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide(width: 5),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        width: 350,
+                        child: TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          // Password Text Field
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.lock),
+                            hintText: 'Enter Password',
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide(width: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        width: 350,
+                        child: TextField(
+                          controller: confirmPwController,
+                          obscureText: true,
+                          // Confirm Password Text Field
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.lock),
+                            hintText: 'Confirm Password',
+                            border: UnderlineInputBorder(
+                              borderSide: BorderSide(width: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to the SignInPage on button press
+                          _registerUser();
+                          print(usernameController.text);
+                          print(emailController.text);
+                          print(passwordController.text);
+                          print(confirmPwController.text);
+                        },
+                        child: Container(
+                          height: 60,
+                          width: 300,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xff264193),
+                                Color(0xff81bed4)
+                              ], // Define gradient colors
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius:
+                                BorderRadius.circular(30), // Round corners
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Already have an account?'),
+                              TextButton(
+                                onPressed: () {
+                                  // Navigate to the HomePage on button press
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SignInPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.facebook),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.computer),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               )

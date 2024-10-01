@@ -47,171 +47,169 @@ class _SignInPageState extends State<SignInPage> {
             painter: RightTrianglePainter(),
             child: Container(),
           ),
-          Column(
+          ListView(
             children: [
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 80),
-                    child: Column(
-                      children: [
-                        Text(
-                          'COLLABORATIVE',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontFamily: 'HeyGotcha',
-                            foreground: Paint()
-                              ..style = PaintingStyle.stroke
-                              ..strokeWidth =
-                                  1 // Adjust the width of the outline
-                              ..color =
-                                  Color(0xff274293), // Color of the outline
+              Padding(
+                padding: const EdgeInsets.only(top: 80),
+                child: Column(
+                  children: [
+                    Text(
+                      'COLLABORATIVE',
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontFamily: 'HeyGotcha',
+                        foreground: Paint()
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth =
+                              1 // Adjust the width of the outline
+                          ..color =
+                              Color(0xff274293), // Color of the outline
+                      ),
+                    ),
+                    Text(
+                      'SAVINGS TRACKER',
+                      style: TextStyle(
+                          fontFamily: 'BebasNeue',
+                          fontSize: 60,
+                          color: Color(0xff274293)),
+                    ),
+                    Container(
+                      width: 350,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(width: 20),
+                          SizedBox(
+                            width: 150,
+                            height: 200,
+                            child: Image.asset('images/logo.png'),
                           ),
-                        ),
-                        Text(
-                          'SAVINGS TRACKER',
-                          style: TextStyle(
-                              fontFamily: 'BebasNeue',
-                              fontSize: 60,
-                              color: Color(0xff274293)),
-                        ),
-                        Container(
-                          width: 350,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(width: 20),
-                              SizedBox(
-                                width: 150,
-                                height: 200,
-                                child: Image.asset('images/logo.png'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: Container(
-                            child: Row(
-                              children: [
-                                SizedBox(width: 80),
-                                Text(
-                                  'Sign In',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 30),
-                            width: 300,
-                            child: TextField(
-                              controller: emailController,
-                              // Email Text Field
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.email),
-                                hintText: 'Enter Email',
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(width: 5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: 300,
-                            child: TextField(
-                              // Password Text Field
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.lock),
-                                hintText: 'Enter Password',
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(width: 5),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // Navigate to the TrackerPage on button press
-                            _loginUser();
-                          },
-                          child: Container(
-                            height: 60,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              gradient: kLinearGradient,
-                              borderRadius:
-                                  BorderRadius.circular(30), // Round corners
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Column(
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Container(
+                        child: Row(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Don’t have an account?'),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SignUpPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'Sign up',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ],
+                            SizedBox(width: 80),
+                            Text(
+                              'Sign In',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.facebook),
-                                ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.computer),
-                                ),
-                              ],
-                            )
                           ],
                         ),
-                      ],
+
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Center(
+                child: Container(
+                  margin: EdgeInsets.only(top: 30),
+                  width: 350,
+                  child: TextField(
+                    controller: emailController,
+                    // Email Text Field
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.email),
+                      hintText: 'Enter Email',
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(width: 5),
+                      ),
                     ),
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Center(
+                child: Container(
+                  width: 350,
+                  child: TextField(
+                    // Password Text Field
+                    obscureText: true,
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                      hintText: 'Enter Password',
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(width: 5),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              TextButton(
+                onPressed: () {
+                  // Navigate to the TrackerPage on button press
+                  _loginUser();
+                },
+                child: Container(
+                  height: 60,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    gradient: kLinearGradient,
+                    borderRadius:
+                    BorderRadius.circular(30), // Round corners
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Don’t have an account?'),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignUpPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Sign up',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.facebook),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.computer),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ],
           )

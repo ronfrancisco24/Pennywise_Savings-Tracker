@@ -60,10 +60,8 @@ class _SignInPageState extends State<SignInPage> {
                         fontFamily: 'HeyGotcha',
                         foreground: Paint()
                           ..style = PaintingStyle.stroke
-                          ..strokeWidth =
-                              1 // Adjust the width of the outline
-                          ..color =
-                              Color(0xff274293), // Color of the outline
+                          ..strokeWidth = 1 // Adjust the width of the outline
+                          ..color = Color(0xff274293), // Color of the outline
                       ),
                     ),
                     Text(
@@ -96,12 +94,10 @@ class _SignInPageState extends State<SignInPage> {
                             Text(
                               'Sign In',
                               style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
-
                       ),
                     ),
                   ],
@@ -109,7 +105,7 @@ class _SignInPageState extends State<SignInPage> {
               ),
               Center(
                 child: Container(
-                  margin: EdgeInsets.only(top: 30),
+                  margin: EdgeInsets.only(top: 30, bottom: 20),
                   width: 350,
                   child: TextField(
                     controller: emailController,
@@ -124,12 +120,10 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
               Center(
                 child: Container(
                   width: 350,
+                  margin: EdgeInsets.only(bottom: 30),
                   child: TextField(
                     // Password Text Field
                     obscureText: true,
@@ -144,9 +138,6 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 30,
-              ),
               TextButton(
                 onPressed: () {
                   // Navigate to the TrackerPage on button press
@@ -157,8 +148,7 @@ class _SignInPageState extends State<SignInPage> {
                   width: 300,
                   decoration: BoxDecoration(
                     gradient: kLinearGradient,
-                    borderRadius:
-                    BorderRadius.circular(30), // Round corners
+                    borderRadius: BorderRadius.circular(30), // Round corners
                   ),
                   child: Center(
                     child: Text(
@@ -190,8 +180,7 @@ class _SignInPageState extends State<SignInPage> {
                         child: Text(
                           'Sign up',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                              fontWeight: FontWeight.bold, color: Colors.black),
                         ),
                       ),
                     ],
@@ -218,6 +207,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 }
+
 
 class RightTrianglePainter extends CustomPainter {
   @override

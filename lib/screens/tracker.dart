@@ -1,11 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/screens/allocation.dart';
 import 'package:savings_2/widgets/constants.dart';
 import 'home_page.dart';
-import 'leaderboard.dart';
-import '../widgets/constants.dart';
-import 'profile.dart';
 import 'package:savings_2/authentication/auth_service.dart';
+import 'package:savings_2/data/firebase_data.dart';
+
 
 final expenses = [
   // Add more expenses here
@@ -36,6 +36,8 @@ class _TrackerPageState extends State<TrackerPage>
   late AnimationController controller;
 
   final AuthService authService = AuthService();
+  final FirebaseData fireStore = FirebaseData();
+
 
   @override
   void initState() {
@@ -66,40 +68,70 @@ class _TrackerPageState extends State<TrackerPage>
             borderRadius: BorderRadius.circular(15),
           ),
           title: Text('Enter Your Details'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: targetGoalController,
-                  decoration: InputDecoration(
-                    labelText: 'Target Goal',
-                    hintText: 'e.g., Buy a new laptop',
-                    border: OutlineInputBorder(),
-                  ),
+          content: StreamBuilder<QuerySnapshot>(
+            stream: fireStore.db.collection('savings').snapshots(),
+            builder: (context, snapshot) {
+              // Handle error case
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+
+              // Show loading indicator while data is being fetched
+              if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              }
+
+              // Extract the data
+              final documents = snapshot.data!.docs;
+
+              // Pre-fill the text fields with the fetched data if available
+              String targetGoal = documents.isNotEmpty ? documents.last['goal'].toString() : '';
+              String daysRemaining = documents.isNotEmpty ? documents.last['daysRemaining'].toString() : '';
+              String budget = documents.isNotEmpty ? documents.last['budget'].toString() : '';
+
+
+
+              // Populate the TextControllers with the fetched data
+              targetGoalController.text = targetGoal;
+              daysRemainingController.text = daysRemaining;
+              budgetController.text = budget;
+
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: targetGoalController,
+                      decoration: InputDecoration(
+                        labelText: 'Target Goal',
+                        hintText: 'e.g., Buy a new laptop',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: daysRemainingController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Days To Save',
+                        hintText: 'e.g., 30',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: budgetController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Budget',
+                        hintText: 'e.g., 1000',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: daysRemainingController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Days To Save',
-                    hintText: 'e.g., 30',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: budgetController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Budget',
-                    hintText: 'e.g., 1000',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
           actions: <Widget>[
             TextButton(
@@ -110,16 +142,40 @@ class _TrackerPageState extends State<TrackerPage>
             ),
             TextButton(
               onPressed: () {
-                // Retrieve and use values as needed
-                String targetGoal = targetGoalController.text;
-                String daysRemaining = daysRemainingController.text;
-                String budget = budgetController.text;
+                final user = authService.getCurrentUser();  // Get the current user
 
-                print('Target Goal: $targetGoal');
-                print('Days To Save: $daysRemaining');
-                print('Budget: $budget');
+                if (user != null) {
+                  String userID = user.uid;  // Extract the user ID (UID)
 
-                Navigator.of(context).pop();
+                  // Retrieve and use values as needed
+                  String targetGoal = targetGoalController.text;
+                  String daysRemaining = daysRemainingController.text;
+                  String budget = budgetController.text;
+
+                  // Convert string inputs to integers
+                  int? goal = int.tryParse(targetGoal);
+                  int? days = int.tryParse(daysRemaining);
+                  int? budgetValue = int.tryParse(budget);
+
+                  if (goal != null && days != null && budgetValue != null) {
+                    fireStore.addSavingsData(
+                      userId: userID,  // Pass the user ID as a String
+                      goal: goal,      // Pass the goal as an integer
+                      days: days,      // Pass the days as an integer
+                      budget: budgetValue, // Pass the budget as an integer
+                    );
+
+                    print('Target Goal: $targetGoal');
+                    print('Days To Save: $daysRemaining');
+                    print('Budget: $budget');
+                  } else {
+                    print('Please enter valid numbers for goal, days, and budget.');
+                  }
+
+                  Navigator.of(context).pop();  // Close the dialog after submission
+                } else {
+                  print('Error: User is not logged in.'); // Handle user not logged in
+                }
               },
               child: Text('Submit'),
             ),
@@ -308,11 +364,7 @@ class _TrackerPageState extends State<TrackerPage>
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => HomePage()),
-                                );
+                                kBottomSheet(context: context, budget: 3.0, price: 2.0);
                               },
                               child: Icon(
                                 Icons.add,

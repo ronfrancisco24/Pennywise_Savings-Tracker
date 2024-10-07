@@ -57,9 +57,16 @@ class _SignUpPageState extends State<SignUpPage> {
       backgroundColor: Color(0xffebedf0),
       body: SafeArea(
         child: Stack(children: [
-          CustomPaint(
-            painter: RightTrianglePainter(),
-            child: Container(),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 10,
+            bottom: 0,
+            child: CustomPaint(
+              painter: RightTrianglePainter(),
+              child: Container(
+              ),
+            ),
           ),
           ListView(
             children: [

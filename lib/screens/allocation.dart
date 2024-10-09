@@ -13,6 +13,7 @@ class AllocationPage extends StatefulWidget {
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
   late AnimationController controller;
+  List<String> categories = [];               //List for Categories
 
   @override
   void initState() {
@@ -97,6 +98,70 @@ class _AllocationPageState extends State<AllocationPage>
                 print('Target Goal: $targetGoal');
                 print('Days To Save: $daysRemaining');
                 print('Budget: $budget');
+
+                Navigator.of(context).pop();
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showAnotherPromptPopup(BuildContext context) {
+    TextEditingController categoryInputController = TextEditingController();
+    TextEditingController priorityLevelController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text('Enter a Category'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: categoryInputController,
+                  decoration: InputDecoration(
+                    labelText: 'Category',
+                    hintText: 'e.g., School',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: priorityLevelController,
+                  decoration: InputDecoration(
+                    labelText: 'Priority Level',
+                    hintText: 'e.g., 1-9',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String categoryInput = categoryInputController.text;
+
+                setState(() {
+                  categories.add(categoryInput); //prints the category input
+                });
+
+                print('Category: $categoryInput');
 
                 Navigator.of(context).pop();
               },
@@ -272,6 +337,62 @@ class _AllocationPageState extends State<AllocationPage>
                   ],
                 ),
               ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Categories',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      showAnotherPromptPopup(context);
+                    },
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.black,
+                      size: 16,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                        padding: EdgeInsets.all(10),
+                        minimumSize: Size(30, 30)),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Wrap(                          //Prevents ovelapping of categories
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: categories.map((category) => Container(                         //.map() transforms ech element into a list.
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),            // the => Container() enables list to transform into separate containers.
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(187, 233, 255, 100.0),
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(0, 3),  // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                      )).toList(),    //Converts the iterable(results from the .map() into a list.
+                    ),
+                  ],
+                ),
+              )
+
             ],
           ),
         ),

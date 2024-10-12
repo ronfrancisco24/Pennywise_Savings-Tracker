@@ -1,44 +1,84 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseData {
-  final FirebaseFirestore db = FirebaseFirestore.instance;
+  final CollectionReference userData =
+      FirebaseFirestore.instance.collection('userData');
 
-  Future<void> addSavingsData({String? userId, int? goal, int? days, int? budget}) async {
+  Future<void> addSavingsData({
+    required String userId,
+    required int goal,
+    required int days,
+    required int budget,
+  }) async {
     try {
-      Map<String, dynamic> data = {
-        'userId': userId,
-        'goal': goal,
-        'dayş': days,
-        'budget': budget
-      };
-      await db.collection('savings').add(data);
+      await userData
+          .doc(userId)
+          .collection('savings')
+          .doc('user_savings')
+          .set({'goal': goal, 'days': days, 'budget': budget});
+      print('Savings data added successfully for user: $userId');
     } catch (e) {
-      print('Error importing data.');
+      print('Error adding savings data: $e');
     }
   }
 
-  Future<void> fetchSavingsData() async {
+  Stream<DocumentSnapshot<Object?>> fetchSavingsData(String userId) {
+    return userData
+        .doc(userId)
+        .collection('savings')
+        .doc('personal_savings')
+        .snapshots();
+  }
 
+
+
+  // adds expenses data
+
+  Future<void> addExpensesData({
+    required String userId,
+    required String product,
+    required double price
+  }) async {
     try {
-      QuerySnapshot querySnapshot = await db.collection('savings').get();
-
-      // access different fields in docs
-
-      for (var doc in querySnapshot.docs){
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        int goal = data['goal'];
-        int days = data['days'];
-        int budget = data['budget'];
-
-        print('budget:$budget, days:$days, goal:$goal}');
-      }
-
-    } catch(e){
-        print('Error fetching data.');
+      await userData
+          .doc(userId)
+          .collection('expenses')
+          .doc('personal_expenses')
+          .set({'product': product, 'price': price});
+      print('Expenses data added successfully for user: $userId');
+    } catch (e) {
+      print('Error adding savings data: $e');
     }
+  }
+
+  // fetches expenses data
+
+  Stream<DocumentSnapshot<Object?>> fetchExpensesData(String userId) {
+    
+    int num = 1;
+    return userData
+        .doc(userId)
+        .collection('expenses')
+        .doc('user_expenses')
+        .snapshots();
+  }
+
+  // update data
+
+  Future<void> updateExpensesData({
+    required String userId,
+    required String product,
+    required double price
+  }) async {
+    try {
+      await userData
+          .doc(userId)
+          .collection('expenses')
+          .doc('personal_expenses')
+          .update({'product': product, 'price': price});
+      print('Expenses data added successfully for user: $userId');
+    } catch (e) {
+      print('Error adding savings data: $e');
+    }
+  }
 }
-
-}
-
-

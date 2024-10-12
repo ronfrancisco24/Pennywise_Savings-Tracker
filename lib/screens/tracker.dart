@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/screens/allocation.dart';
@@ -336,15 +338,30 @@ class _TrackerPageState extends State<TrackerPage>
                             width: double.infinity,
                             padding: EdgeInsets.all(15),
                             decoration: kGradientColors,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            child: Column(
                               children: [
-                                Text("Today's Target",
-                                    style: kMontserratWhiteMedium),
-                                Text(
-                                  '\$ 200.00',
-                                  style: kMontserratWhiteMedium,
-                                )
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Today's Target",
+                                        style: kMontserratWhiteMedium),
+                                    Text(
+                                      '\$ 0',
+                                      style: kMontserratWhiteMedium,
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Suggested Savings",
+                                        style: kMontserratWhiteMedium),
+                                    Text(
+                                      '\$ 0',
+                                      style: kMontserratWhiteMedium,
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -360,7 +377,8 @@ class _TrackerPageState extends State<TrackerPage>
                                       kBottomSheet(
                                           context: context,
                                           budget: 3.0,
-                                          price: 2.0);
+                                          price: 2.0,
+                                          userId: userID);
                                     },
                                     child: Icon(
                                       Icons.add,
@@ -384,6 +402,21 @@ class _TrackerPageState extends State<TrackerPage>
                                     style: ElevatedButton.styleFrom(
                                         shape: CircleBorder()),
                                   ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => HomePage()),
+                                      );
+                                    },
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.black,
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                        shape: CircleBorder()),
+                                  ),
                                 ],
                               )
                             ],
@@ -393,21 +426,49 @@ class _TrackerPageState extends State<TrackerPage>
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: expenses.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(expenses[index].key,
-                                    style: kNormalMontserratBlackMedium),
-                                Text("\$${expenses[index].value}",
-                                    style: kNormalMontserratBlackMedium),
-                              ],
-                            ),
+                      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: fireStore.fetchExpensesData(userID),
+                        builder: (context, snapshot) {
+
+                          // if (snapshot.connectionState == ConnectionState.waiting) {
+                          //   return Center(child: CircularProgressIndicator());
+                          // }
+
+                          if (snapshot.hasError){
+                            print('snapshot ${snapshot.error}');
+                          }
+
+                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty){
+                           print('No expenses data found.');
+                          }
+
+
+                          var expenses = snapshot.data!.docs;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: expenses.length,
+                            itemBuilder: (context, index) {
+
+                              var expenseData = expenses[index].data();
+
+                              String product = expenseData['product']; // takes the product field
+                              double price = expenseData['price']; // takes the price field
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(product,
+                                        style: kNormalMontserratBlackMedium),
+                                    Text('\$${price.toStringAsFixed(2)}',
+                                        style: kNormalMontserratBlackMedium),
+                                  ],
+                                ),
+                              );
+                            },
                           );
                         },
                       ),

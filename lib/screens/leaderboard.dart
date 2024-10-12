@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:savings_2/screens/tracker.dart';
+import 'package:savings_2/widgets/constants.dart';
 import 'home_page.dart';
 
 void main() {
@@ -78,54 +79,7 @@ class LeaderBoardPage extends StatelessWidget {
             ),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  Icons.house_outlined,
-                  color: Colors.black,
-                  size: 30,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  // wala for the sake of clickability
-                },
-                icon: Icon(
-                  Icons.leaderboard_outlined,
-                  color: Colors.black,
-                  size: 30,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TrackerPage(),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  Icons.person_outline,
-                  color: Colors.black,
-                  size: 30,
-                ),
-              ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: kBottomAppBar(context)
       ),
     );
   }

@@ -40,12 +40,12 @@ class HomePage extends StatelessWidget {
                               color: Color(0xff274293)
                           ),
                         ),
-                        SizedBox(height: 60),
+                        SizedBox(height: 10),
                         Container(
                             height: 350,
                             child:
                             Image.asset('images/logo.png')), // Image asset
-                        SizedBox(height: 90),
+                        SizedBox(height: 60),
                         TextButton(
                           // Gradient Button
                           onPressed: () {

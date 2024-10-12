@@ -13,11 +13,13 @@ class AllocationPage extends StatefulWidget {
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
   late AnimationController controller;
+
   List<String> categories = [];               //List for Categories
 
   @override
   void initState() {
     super.initState();
+    int number = 0 ;
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -54,7 +56,7 @@ class _AllocationPageState extends State<AllocationPage>
                   controller: targetGoalController,
                   decoration: InputDecoration(
                     labelText: 'Target Goal',
-                    hintText: 'e.g., Buy a new laptop',
+                    hintText: 'e.g., Buy a new laptop ',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -113,6 +115,8 @@ class _AllocationPageState extends State<AllocationPage>
     TextEditingController categoryInputController = TextEditingController();
     TextEditingController priorityLevelController = TextEditingController();
 
+    // Check if category limit is reached
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -155,14 +159,24 @@ class _AllocationPageState extends State<AllocationPage>
             ),
             TextButton(
               onPressed: () {
+                if (categories.length >= 9) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'The limit is 9 categories, please delete one if you want to add more.',
+
+                      ),
+                    ),
+                  );
+                  return; // Exit if limit reached
+                }
                 String categoryInput = categoryInputController.text;
 
                 setState(() {
-                  categories.add(categoryInput); //prints the category input
+                  categories.add(categoryInput); // Add category input
                 });
 
                 print('Category: $categoryInput');
-
                 Navigator.of(context).pop();
               },
               child: Text('Submit'),
@@ -172,6 +186,7 @@ class _AllocationPageState extends State<AllocationPage>
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +394,7 @@ class _AllocationPageState extends State<AllocationPage>
                               color: Colors.grey.withOpacity(0.5),
                               spreadRadius: 1,
                               blurRadius: 3,
-                              offset: Offset(0, 3),  // Shadow position
+                              offset: Offset(0, 3), //  Shadow position
                             ),
                           ],
                         ),

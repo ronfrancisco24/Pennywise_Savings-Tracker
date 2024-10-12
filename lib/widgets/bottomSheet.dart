@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'constants.dart';
+import 'package:savings_2/data/firebase_data.dart'
+    as db; // Import your FirebaseData file
 
 Future<void> kBottomSheet({
   required BuildContext context,
   required double budget,
   required double price,
+  required String userId, // Ensure you pass userId
 }) {
   final TextEditingController _productController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+
+  // Create an instance of FirebaseData
+  final db.FirebaseData firebaseData = db.FirebaseData();
 
   return showModalBottomSheet(
     context: context,
@@ -17,7 +23,9 @@ Future<void> kBottomSheet({
         height: 200,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(30),
+          ),
         ),
         child: Column(
           children: [
@@ -29,7 +37,32 @@ Future<void> kBottomSheet({
                   'Input Expense',
                   style: kNormalMontserratBlackMedium,
                 ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.add))
+                IconButton(
+                  onPressed: () async {
+                    String product = _productController.text;
+                    String priceText = _priceController.text;
+
+                    if (product.isNotEmpty && priceText.isNotEmpty) {
+                      double? parsedPrice = double.tryParse(priceText);
+
+                      if (parsedPrice != null) {
+                        await firebaseData.addExpensesData(
+                          userId: userId,
+                          product: product,
+                          price: parsedPrice,
+                        );
+
+                        // Optionally close the bottom sheet
+                        Navigator.of(context).pop();
+                      } else {
+                        print("Invalid price");
+                      }
+                    } else {
+                      print("Please fill in all fields");
+                    }
+                  },
+                  icon: Icon(Icons.add),
+                ),
               ],
             ),
             SizedBox(

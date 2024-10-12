@@ -30,46 +30,40 @@ class FirebaseData {
         .snapshots();
   }
 
-
-
   // adds expenses data
-
-  Future<void> addExpensesData({
+  //TODO Step 1. add data in product.
+  Future<String?> addExpensesData({
     required String userId,
     required String product,
     required double price
 
   }) async {
-
-    int num = 1;
     try {
-      await userData
+      DocumentReference docRef = await userData
           .doc(userId)
           .collection('expenses')
-          .doc('personal_expenses')
-          .set({'product': product, 'price': price});
+          .add({'product': product, 'price': price});
       print('Expenses data added successfully for user: $userId');
+      return docRef.id;
+
     } catch (e) {
       print('Error adding savings data: $e');
     }
   }
 
   // fetches expenses data
-
-  Stream<DocumentSnapshot<Object?>> fetchExpensesData(String userId) {
-
-
+  //TODO Step 2. update data in product.
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchExpensesData(String userId) {
     return userData
         .doc(userId)
-        .collection('expenses')
-        .doc('user_expenses')
-        .snapshots();
+        .collection('expenses').snapshots();
   }
 
   // update data
 
   Future<void> updateExpensesData({
     required String userId,
+    required String expenseId,
     required String product,
     required double price
   }) async {

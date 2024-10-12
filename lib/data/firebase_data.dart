@@ -14,7 +14,7 @@ class FirebaseData {
       await userData
           .doc(userId)
           .collection('savings')
-          .doc('user_savings')
+          .doc('personal_savings')
           .set({'goal': goal, 'days': days, 'budget': budget});
       print('Savings data added successfully for user: $userId');
     } catch (e) {
@@ -38,7 +38,10 @@ class FirebaseData {
     required String userId,
     required String product,
     required double price
+
   }) async {
+
+    int num = 1;
     try {
       await userData
           .doc(userId)
@@ -54,8 +57,8 @@ class FirebaseData {
   // fetches expenses data
 
   Stream<DocumentSnapshot<Object?>> fetchExpensesData(String userId) {
-    
-    int num = 1;
+
+
     return userData
         .doc(userId)
         .collection('expenses')

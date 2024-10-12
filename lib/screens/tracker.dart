@@ -338,15 +338,30 @@ class _TrackerPageState extends State<TrackerPage>
                             width: double.infinity,
                             padding: EdgeInsets.all(15),
                             decoration: kGradientColors,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            child: Column(
                               children: [
-                                Text("Today's Target",
-                                    style: kMontserratWhiteMedium),
-                                Text(
-                                  '\$ 0',
-                                  style: kMontserratWhiteMedium,
-                                )
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Today's Target",
+                                        style: kMontserratWhiteMedium),
+                                    Text(
+                                      '\$ 0',
+                                      style: kMontserratWhiteMedium,
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Suggested Savings",
+                                        style: kMontserratWhiteMedium),
+                                    Text(
+                                      '\$ 0',
+                                      style: kMontserratWhiteMedium,
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
                           ),

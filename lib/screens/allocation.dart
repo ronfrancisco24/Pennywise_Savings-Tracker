@@ -12,9 +12,16 @@ class AllocationPage extends StatefulWidget {
 
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
+  bool _isExpanded = false;
   late AnimationController controller;
 
   List<String> categories = [];               //List for Categories
+
+  void _toggleExpenses(){
+    setState((){
+      _isExpanded = !_isExpanded; //toggle if expanded
+    });
+  }
 
   @override
   void initState() {
@@ -34,6 +41,7 @@ class _AllocationPageState extends State<AllocationPage>
     controller.dispose();
     super.dispose();
   }
+
 
   void showPromptPopup(BuildContext context) {
     TextEditingController targetGoalController = TextEditingController();
@@ -406,7 +414,48 @@ class _AllocationPageState extends State<AllocationPage>
                     ),
                   ],
                 ),
-              )
+              ),
+              Column(
+                children: [
+                  Container(
+                      width: _isExpanded ? double.infinity : 500,
+                      height: _isExpanded ? 90 : 60,
+                      child: ElevatedButton(
+                        onPressed: _toggleExpenses,
+                        style: ButtonStyle(
+                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius:  BorderRadius.circular(_isExpanded ? 20 : 20),
+                            ),
+                        ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 20),
+                            Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Expenses'),
+                                Icon(
+                                  _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                             ),
+                           ],
+                          ),
+                        if (_isExpanded)
+                          Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text('contents'),
+                            //contents of the expenses
+                          ),
+                          ],
+                        ),
+                      ),
+                  ),
+                ],
+              ),
+
+
 
             ],
           ),

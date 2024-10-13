@@ -9,6 +9,12 @@ class AuthService {
     return _auth.currentUser;
   }
 
+  //get current email
+  String? getCurrentUserEmail(){
+    return _auth.currentUser?.email;
+  }
+
+
   // is user signed in
   bool isUserSignedIn(){
     return _auth.currentUser != null;

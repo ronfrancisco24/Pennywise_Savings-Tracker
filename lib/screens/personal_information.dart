@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/constants.dart';
+import 'package:savings_2/authentication/auth_service.dart';
 
 
 void main(){
@@ -13,26 +14,27 @@ class PersonalInfoPage extends StatefulWidget {
 
 class _PersonalInfoPageState extends State <PersonalInfoPage>{
   // Create a TextEditingController
-  TextEditingController _nicknameController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  //Authenticating firebase to the personal information
+  final AuthService authService = AuthService();
 
 
   @override
   void initState(){
     super.initState();
-    //Set default username for debugging
-    _nicknameController.text = "TEST NICKNAME";
-    _nameController.text = "TEST NAME";
-    _emailController.text = "TESTEMAIL@email.com";
+    final username = authService.getUserName();
+    final userEmail = authService.getCurrentUserEmail();
+    //Set default placeholder for debugging
+    _nameController.text = '${username}';
+    _emailController.text = '${userEmail}';
     _passwordController.text = "TEST PASSWORD";
 
   }
   @override
   void dispose(){
     //Clean up the controller when widget is disposed.
-    _nicknameController.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -66,22 +68,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                                 ]
                             ),
                             child: kCircleAvatar),
-                        Container(
-                          margin: EdgeInsets.only(top: 30),
-                          width: 300,
-                          child: TextField(
-                            // Username field
-                            controller: _nicknameController, //Setting the controller
-                            decoration: InputDecoration(
-                              labelText: 'Nickname',
-                              hintText: 'Enter Your Nickname',
-                              border:UnderlineInputBorder(
-                                borderSide: BorderSide(width: 5),
-                              ),
-
-                            ),
-                          ),
-                        ),
                         Container(
                           margin: EdgeInsets.only(top: 30),
                           width: 300,
@@ -121,20 +107,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                             decoration: InputDecoration(
                               labelText: 'Password',
                               hintText: 'Enter your Password',
-                              border:UnderlineInputBorder(
-                                borderSide: BorderSide(width: 5),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(top: 30),
-                          width: 300,
-                          child: TextField(
-                            // Birthday field
-                            decoration: InputDecoration(
-                              labelText: 'Your Birthday',
-                              hintText: 'Enter Your Birthday',
                               border:UnderlineInputBorder(
                                 borderSide: BorderSide(width: 5),
                               ),

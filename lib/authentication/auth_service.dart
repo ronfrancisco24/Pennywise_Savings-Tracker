@@ -35,6 +35,33 @@ class AuthService {
     }
   }
 
+  //Update the display name of the user
+  Future<void> updateDisplayName(String displayName) async{
+    User? user = _auth.currentUser;
+    if(user != null){
+      try{
+        await user.updateProfile(displayName: displayName);
+        await user.reload(); //Reload the user to apply changes
+        print("Display name updated to: $displayName");
+      }catch(e){
+        print("Failed to update Display Name: $e");
+      }
+    }
+  }
+  //Update the email of the user
+  Future<void> updateEmail(String email)async{
+    User? user = _auth.currentUser;
+    if(user !=null){
+      try{
+        await user.updateEmail(email);
+        await user.reload(); //Reloads to apply changes
+        print("Email updated to: $email");
+      } catch(e){
+        print("Failed to updated Email: $e");
+      }
+    }
+  }
+
   // is user signed in
   bool isUserSignedIn(){
     return _auth.currentUser != null;

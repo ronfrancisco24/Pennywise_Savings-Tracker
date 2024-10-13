@@ -30,7 +30,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
     //Set default placeholder for debugging
     _nameController.text = '${username}';
     _emailController.text = '${userEmail}';
-
   }
   @override
   void dispose(){
@@ -39,6 +38,23 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
     _emailController.dispose();
     super.dispose();
   }
+  //Saving changes to Firebase
+  Future<void> _saveChanges()async{
+    String newName = _nameController.text.trim();
+    String newEmail = _emailController.text.trim();
+    if (newName.isNotEmpty){
+      await authService.updateDisplayName(newName);
+    }
+    if (newEmail.isNotEmpty){
+      await authService.updateEmail(newEmail);
+    }
+    //Show a success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Profile updated successfully')),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context){
     return MaterialApp(
@@ -150,13 +166,16 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                               ],
                             ),
                             child: Center(
-                                child: Text('Save Changes',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontFamily: 'FontsFree',
-                                    fontWeight: FontWeight.normal,
-                                  ),)
+                                child: TextButton(
+                                  onPressed: _saveChanges,
+                                  child: Text('Save Changes',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontFamily: 'FontsFree',
+                                      fontWeight: FontWeight.normal,
+                                    ),),
+                                )
                             )
                         ),
                         SizedBox(

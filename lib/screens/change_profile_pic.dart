@@ -29,6 +29,7 @@ Future<File?> _cropImage(File imageFile) async{
   }
   return null;
 }
+
 //Function for uploading image to Firebase Storage
 Future<void> _uploadImageToFirebase(File imageFile) async{
   FirebaseStorage storage = FirebaseStorage.instance;
@@ -38,9 +39,11 @@ Future<void> _uploadImageToFirebase(File imageFile) async{
   _downloadUrl = await snapshot?.ref.getDownloadURL();
   print('Image uploaded successfully. URL: $_downloadUrl');
 }
+
 File? getImage(){
   return _image;
 }
+
 String? getDownloadUrl(){
   print('PROFILE PICTURE: $_downloadUrl');
   return _downloadUrl;

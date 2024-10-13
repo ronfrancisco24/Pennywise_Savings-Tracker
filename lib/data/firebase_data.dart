@@ -32,20 +32,18 @@ class FirebaseData {
 
   // adds expenses data
   //TODO Step 1. add data in product.
-  Future<String?> addExpensesData({
-    required String userId,
-    required String product,
-    required double price
-
-  }) async {
+  Future<String?> addExpensesData(
+      {required String userId,
+      required String product,
+      required double price}) async {
     try {
       DocumentReference docRef = await userData
           .doc(userId)
           .collection('expenses')
           .add({'product': product, 'price': price});
       print('Expenses data added successfully for user: $userId');
-      return docRef.id;
-
+      var expenseID = docRef.id;
+      return expenseID;
     } catch (e) {
       print('Error adding savings data: $e');
     }
@@ -54,28 +52,34 @@ class FirebaseData {
   // fetches expenses data
   //TODO Step 2. update data in product.
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchExpensesData(String userId) {
-    return userData
-        .doc(userId)
-        .collection('expenses').snapshots();
+    return userData.doc(userId).collection('expenses').snapshots();
   }
 
   // update data
 
-  Future<void> updateExpensesData({
-    required String userId,
-    required String expenseId,
-    required String product,
-    required double price
-  }) async {
+  Future<void> updateExpensesData(
+      {required String userId,
+      required String expenseId,
+      required String product,
+      required double price}) async {
     try {
       await userData
           .doc(userId)
           .collection('expenses')
-          .doc('personal_expenses')
-          .update({'product': product, 'price': price});
+          .doc(expenseId)
+          .update({'product': product, 'price': price}); // uses the update in firestore
       print('Expenses data added successfully for user: $userId');
     } catch (e) {
       print('Error adding savings data: $e');
+    }
+  }
+
+  Future<void> deleteExpensesData(
+      {required String userID, required String expenseID}) async {
+    try {
+      await userData.doc(userID).collection('expenses').doc(expenseID).delete();
+    } catch (e) {
+      print('Error deleteing expense: ${e}');
     }
   }
 }

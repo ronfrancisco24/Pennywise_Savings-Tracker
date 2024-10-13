@@ -40,7 +40,6 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xffebedf0),
       body: SafeArea(
         child: Stack(children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
 import '../widgets/constants.dart';
 import 'tracker.dart';
+import 'package:savings_2/authentication/auth_service.dart';
 
 class AllocationPage extends StatefulWidget {
   const AllocationPage({super.key});
@@ -12,6 +13,7 @@ class AllocationPage extends StatefulWidget {
 
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
+  final AuthService authService = AuthService();
   bool _isExpanded = false;
   bool _categoryExpanded = false;
   late AnimationController controller;
@@ -34,6 +36,7 @@ class _AllocationPageState extends State<AllocationPage>
   @override
   void initState() {
     super.initState();
+    final user = authService.getCurrentUser();
     int number = 0 ;
     controller = AnimationController(
       vsync: this,
@@ -206,6 +209,8 @@ class _AllocationPageState extends State<AllocationPage>
 
   @override
   Widget build(BuildContext context) {
+    final username = authService.getUserName();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -220,15 +225,15 @@ class _AllocationPageState extends State<AllocationPage>
                 style: TextStyle(color: Colors.grey),
               ),
               Text(
-                'Aaron',
+                '${username}',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
-              )
+              ),
             ],
           ),
         ),
         bottomNavigationBar: kBottomAppBar(context),
-        body: Padding(
+        body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
@@ -295,7 +300,7 @@ class _AllocationPageState extends State<AllocationPage>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
@@ -331,7 +336,7 @@ class _AllocationPageState extends State<AllocationPage>
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                           SizedBox(height: 20),
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
@@ -371,7 +376,7 @@ class _AllocationPageState extends State<AllocationPage>
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Categories',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
@@ -426,74 +431,119 @@ class _AllocationPageState extends State<AllocationPage>
               Column(
                 children: [
                   Container(
-                      width: _isExpanded ? double.infinity : 500,
-                      height: _isExpanded ? 200 : 60,
-                      child: ElevatedButton(
-                        onPressed: _toggleExpenses,
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius:  BorderRadius.circular(_isExpanded ? 20 : 20),
-                            ),
-                        ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 17),
-                            Row(
+                    width: _isExpanded ? double.infinity : 500,
+                    height: _isExpanded ? 400 : 60,
+                    child: Container( // Toggles expenses expanding
+                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 7),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Expenses'),
-                                Icon(
+                            children: [
+                              const Text('Expenses'),
+                              IconButton(
+                                onPressed: () {
+                                  _toggleExpenses();
+                                },
+                                icon: Icon(
                                   _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                             ),
-                           ],
+                                ),
+                              ),
+                            ],
                           ),
-                        if (_isExpanded)
+                          if (_isExpanded)
                           Padding(
                             padding: const EdgeInsets.only(top: 10),
+                            child: Container(
+                              width: 400, decoration: BoxDecoration(
+                               color: const Color(0xffb1d4e0),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                             child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                                  children: [
+                                  const SizedBox(width:10),
                                   Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _toggleCategory,
-                                      child: const FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text('Item'),
-                                      )
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                        labelText: 'Item',
+                                        labelStyle: TextStyle(color: Colors.blueGrey),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                        ),
+                                        contentPadding: EdgeInsets.only(bottom:1.0),
+                                        ),
+                                      ),
                                     ),
-                                  ),
 
-                                SizedBox(width:5),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _toggleCategory,
-                                      child: const FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text('Category'),
+                                    const SizedBox(width:10),
+                                    Expanded(
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                          labelText: 'Category',
+                                          labelStyle: TextStyle(color: Colors.blueGrey),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                          ),
+                                          contentPadding: EdgeInsets.only(bottom:1.0),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                
-                                SizedBox(width:5),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _toggleCategory,
-                                      child: const FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text('Amount'),
+
+                                    const SizedBox(width:10),
+                                    Expanded(
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                          labelText: 'Amount',
+                                          labelStyle: TextStyle(color: Colors.blueGrey),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                          ),
+                                          contentPadding: EdgeInsets.only(bottom:1.0),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                               ],
-                             ),
-                           ),
+
+                                    const SizedBox(width:1),
+                                    Container(
+                                      width:30,
+                                      child: ElevatedButton(
+                                        onPressed: _toggleCategory,
+                                          style: ElevatedButton.styleFrom(
+                                          shape: CircleBorder(),
+                                          padding: EdgeInsets.all(0),
+                                          ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width:10),
+                                ],
+                              ),
+                            ),
+                          ),
                          ],
                        ),
                      ),
                   ),
+                  const SizedBox(height:40),
                 ],
               ),
             ],

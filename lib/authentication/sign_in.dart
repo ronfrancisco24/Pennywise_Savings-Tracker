@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savings_2/authentication/reset_password.dart';
 import 'package:savings_2/authentication/sign_up.dart';
 import 'package:savings_2/widgets/constants.dart';
 import '../screens/tracker.dart';
@@ -182,6 +183,25 @@ class _SignInPageState extends State<SignInPage> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.black),
                         ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Forgot your'),
+                      TextButton(
+                          onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+                            );
+                          },
+                          child: Text(
+                            'Password?',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
                       ),
                     ],
                   ),

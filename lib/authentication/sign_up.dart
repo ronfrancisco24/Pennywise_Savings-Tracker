@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/authentication/sign_in.dart';
 import 'package:savings_2/widgets/rightTrianglePainter.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
+
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -18,8 +20,13 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController usernameController = TextEditingController();
   // final _formKey = GlobalKey<FormState>(); // identifies form widgets and allows validation.
 
-  Future<void> _registerUser() async {
+  bool isPasswordVisibility = false;               //Manages password visibility
+  bool isPasswordVisible = false;
+  bool isPasswordValid = false;                    //Validates the password input
+  String passwordError = '';
 
+
+  Future<void> _registerUser() async {
     // if password doesnt equal to confirm password, show error
     if (passwordController.text != confirmPwController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -165,7 +172,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         width: 350,
                         child: TextField(
                           controller: passwordController,
-                          obscureText: true,
+                          obscureText: !isPasswordVisibility,
                           // Password Text Field
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.lock),
@@ -173,21 +180,56 @@ class _SignUpPageState extends State<SignUpPage> {
                             border: UnderlineInputBorder(
                               borderSide: BorderSide(width: 5),
                             ),
+                            suffixIcon: IconButton(
+                                icon: Icon(
+                                  isPasswordVisibility
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isPasswordVisibility =
+                                    !isPasswordVisibility; // Toggle visibility
+                                  });
+                                },
+                            ),
                           ),
+                          onChanged: (value){
+                             _validatePassword(value);
+                          },
                         ),
                       ),
+                      if (passwordError.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 37.0, right: 5.0, bottom: 1.0),
+                          child: Text(passwordError,
+                          style: TextStyle(color: Colors.red),),
+                        ),
                       SizedBox(height: 20),
                       Container(
                         width: 350,
                         child: TextField(
                           controller: confirmPwController,
-                          obscureText: true,
+                          obscureText: !isPasswordVisible ,
                           // Confirm Password Text Field
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.lock),
                             hintText: 'Confirm Password',
                             border: UnderlineInputBorder(
                               borderSide: BorderSide(width: 5),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isPasswordVisible =
+                                  !isPasswordVisible; // Toggle visibility
+                                });
+                              },
                             ),
                           ),
                         ),
@@ -279,9 +321,33 @@ class _SignUpPageState extends State<SignUpPage> {
           )
         ]),
       ),
+
     );
   }
-}
+  void _validatePassword(String password) {  //Conditions to set the validation of passwords
+    String error = '';
+
+    if (password.length < 6) {
+      error += 'Must be at least 6 characters long.\n';
+    }
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      error += 'Must have one uppercase letter.\n';
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      error += 'Must have a number digit.\n';
+    }
+    if (!password.contains(RegExp(r'[!@#\$&*~]'))) {
+      error += 'Must have one special character.\n';
+    }
+
+    setState(() {
+      passwordError = error;
+      isPasswordValid = error.isEmpty;
+    });
+  }
+  }
+
+
 
 class RightTrianglePainter extends CustomPainter {
   @override

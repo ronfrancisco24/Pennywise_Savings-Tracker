@@ -13,6 +13,7 @@ class AllocationPage extends StatefulWidget {
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
   bool _isExpanded = false;
+  bool _categoryExpanded = false;
   late AnimationController controller;
 
   List<String> categories = [];               //List for Categories
@@ -20,6 +21,13 @@ class _AllocationPageState extends State<AllocationPage>
   void _toggleExpenses(){
     setState((){
       _isExpanded = !_isExpanded; //toggle if expanded
+    });
+  }
+
+  void _toggleCategory(){
+    setState(()
+    {
+      _categoryExpanded= !_categoryExpanded;
     });
   }
 
@@ -419,7 +427,7 @@ class _AllocationPageState extends State<AllocationPage>
                 children: [
                   Container(
                       width: _isExpanded ? double.infinity : 500,
-                      height: _isExpanded ? 90 : 60,
+                      height: _isExpanded ? 200 : 60,
                       child: ElevatedButton(
                         onPressed: _toggleExpenses,
                         style: ButtonStyle(
@@ -432,7 +440,7 @@ class _AllocationPageState extends State<AllocationPage>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            SizedBox(height: 20),
+                            SizedBox(height: 17),
                             Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -444,19 +452,50 @@ class _AllocationPageState extends State<AllocationPage>
                           ),
                         if (_isExpanded)
                           Padding(
-                            padding: EdgeInsets.only(top: 10),
-                            child: Text('contents'),
-                            //contents of the expenses
-                          ),
-                          ],
-                        ),
-                      ),
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _toggleCategory,
+                                      child: const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text('Item'),
+                                      )
+                                    ),
+                                  ),
+
+                                SizedBox(width:5),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _toggleCategory,
+                                      child: const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text('Category'),
+                                      ),
+                                    ),
+                                  ),
+                                
+                                SizedBox(width:5),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _toggleCategory,
+                                      child: const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text('Amount'),
+                                      ),
+                                    ),
+                                  ),
+                               ],
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
                   ),
                 ],
               ),
-
-
-
             ],
           ),
         ),

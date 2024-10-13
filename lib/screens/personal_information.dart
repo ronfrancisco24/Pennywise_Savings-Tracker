@@ -43,7 +43,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               centerTitle: true,
               title: const Text('Profile Information'),

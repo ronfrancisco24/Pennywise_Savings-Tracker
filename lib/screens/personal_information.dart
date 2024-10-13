@@ -12,11 +12,48 @@ class PersonalInfoPage extends StatefulWidget {
   _PersonalInfoPageState createState() => _PersonalInfoPageState();
 }
 
+class ResetPasswordPage extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Reset Password"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                hintText: "Enter your email",
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                await _authService.sendPasswordResetEmail(emailController.text);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Password reset email sent!")),
+                );
+              },
+              child: Text("Reset Password"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 class _PersonalInfoPageState extends State <PersonalInfoPage>{
   // Create a TextEditingController
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
   //Authenticating firebase to the personal information
   final AuthService authService = AuthService();
 
@@ -29,7 +66,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
     //Set default placeholder for debugging
     _nameController.text = '${username}';
     _emailController.text = '${userEmail}';
-    _passwordController.text = "TEST PASSWORD";
 
   }
   @override
@@ -37,7 +73,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
     //Clean up the controller when widget is disposed.
     _nameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
   @override
@@ -98,23 +133,44 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                             ),
                           ),
                         ),
+                        SizedBox(
+                          height: 35,
+                        ),
                         Container(
-                          margin: EdgeInsets.only(top: 30),
-                          width: 300,
-                          child: TextField(
-                            // Password field
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              hintText: 'Enter your Password',
-                              border:UnderlineInputBorder(
-                                borderSide: BorderSide(width: 5),
-                              ),
+                            width: 200,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              gradient: kLinearGradient,
+                              borderRadius: BorderRadius.circular(20.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  blurStyle: BlurStyle.normal,
+                                ),
+                              ],
                             ),
-                          ),
+                            child: Center(
+                                child: TextButton(
+                                  onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ResetPasswordPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text('Forgot Password',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontFamily: 'FontsFree',
+                                      fontWeight: FontWeight.normal,
+                                    ),),
+                                )
+                            )
                         ),
                         SizedBox(
-                          height: 50,
+                          height: 30,
                         ),
                         Container(
                             width: 300,

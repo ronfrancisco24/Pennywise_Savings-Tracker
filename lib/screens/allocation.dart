@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
 import '../widgets/constants.dart';
 import 'tracker.dart';
-import 'package:savings_2/authentication/auth_service.dart';
 
 class AllocationPage extends StatefulWidget {
   const AllocationPage({super.key});
@@ -13,37 +12,34 @@ class AllocationPage extends StatefulWidget {
 
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
-  final AuthService authService = AuthService();
   bool _isExpanded = false;
   bool _categoryExpanded = false;
   late AnimationController controller;
 
-  List<String> categories = [];               //List for Categories
+  List<String> categories = []; // List for Categories
 
-  void _toggleExpenses(){
-    setState((){
-      _isExpanded = !_isExpanded; //toggle if expanded
+  void _toggleExpenses() {
+    setState(() {
+      _isExpanded = !_isExpanded; // toggle if expanded
     });
   }
 
-  void _toggleCategory(){
-    setState(()
-    {
-      _categoryExpanded= !_categoryExpanded;
+  void _toggleCategory() {
+    setState(() {
+      _categoryExpanded = !_categoryExpanded;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    final user = authService.getCurrentUser();
-    int number = 0 ;
+    int number = 0;
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..addListener(() {
-        setState(() {});
-      });
+      setState(() {});
+    });
     controller.repeat(reverse: false);
   }
 
@@ -52,7 +48,6 @@ class _AllocationPageState extends State<AllocationPage>
     controller.dispose();
     super.dispose();
   }
-
 
   void showPromptPopup(BuildContext context) {
     TextEditingController targetGoalController = TextEditingController();
@@ -111,7 +106,6 @@ class _AllocationPageState extends State<AllocationPage>
             ),
             TextButton(
               onPressed: () {
-                // Retrieve and use values as needed
                 String targetGoal = targetGoalController.text;
                 String daysRemaining = daysRemainingController.text;
                 String budget = budgetController.text;
@@ -133,8 +127,6 @@ class _AllocationPageState extends State<AllocationPage>
   void showAnotherPromptPopup(BuildContext context) {
     TextEditingController categoryInputController = TextEditingController();
     TextEditingController priorityLevelController = TextEditingController();
-
-    // Check if category limit is reached
 
     showDialog(
       context: context,
@@ -183,16 +175,15 @@ class _AllocationPageState extends State<AllocationPage>
                     SnackBar(
                       content: Text(
                         'The limit is 9 categories, please delete one if you want to add more.',
-
                       ),
                     ),
                   );
-                  return; // Exit if limit reached
+                  return;
                 }
                 String categoryInput = categoryInputController.text;
 
                 setState(() {
-                  categories.add(categoryInput); // Add category input
+                  categories.add(categoryInput);
                 });
 
                 print('Category: $categoryInput');
@@ -206,11 +197,39 @@ class _AllocationPageState extends State<AllocationPage>
     );
   }
 
+  // Function to display popup when a category is tapped
+  void showCategoryDetailsPopup(BuildContext context, String category) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text('Category: $category'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('This is where details about the category will be shown.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final username = authService.getUserName();
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -225,10 +244,10 @@ class _AllocationPageState extends State<AllocationPage>
                 style: TextStyle(color: Colors.grey),
               ),
               Text(
-                '${username}',
+                'Aaron',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
-              ),
+              )
             ],
           ),
         ),
@@ -300,7 +319,7 @@ class _AllocationPageState extends State<AllocationPage>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Column(
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
@@ -333,10 +352,10 @@ class _AllocationPageState extends State<AllocationPage>
                             semanticsLabel: 'Linear Progress Indicator',
                             backgroundColor: Colors.blue[900],
                             valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                           SizedBox(height: 20),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
@@ -376,7 +395,7 @@ class _AllocationPageState extends State<AllocationPage>
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'Categories',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
@@ -402,28 +421,40 @@ class _AllocationPageState extends State<AllocationPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Wrap(                          //Prevents ovelapping of categories
+                    Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: categories.map((category) => Container(                         //.map() transforms ech element into a list.
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),            // the => Container() enables list to transform into separate containers.
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(187, 233, 255, 100.0),
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 1,
-                              blurRadius: 3,
-                              offset: Offset(0, 3), //  Shadow position
+                      children: categories
+                          .map(
+                            (category) => GestureDetector(
+                          onTap: () {
+                            showCategoryDetailsPopup(context, category);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(187, 233, 255, 100.0),
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
                             ),
-                          ],
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          category,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                      )).toList(),    //Converts the iterable(results from the .map() into a list.
+                      )
+                          .toList(),
                     ),
                   ],
                 ),
@@ -432,123 +463,81 @@ class _AllocationPageState extends State<AllocationPage>
                 children: [
                   Container(
                     width: _isExpanded ? double.infinity : 500,
-                    height: _isExpanded ? 400 : 60,
-                    child: Container( // Toggles expenses expanding
-                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                    height: _isExpanded ? 200 : 60,
+                    child: ElevatedButton(
+                      onPressed: _toggleExpenses,
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(_isExpanded ? 20 : 20),
+                          ),
+                        ),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 7),
+                          SizedBox(height: 17),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('  Expenses', style: kMontserratBlackMedium),
-                              IconButton(
-                                onPressed: () {
-                                  _toggleExpenses();
-                                },
-                                icon: Icon(
-                                  _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                                ),
+                              Text('Expenses'),
+                              Icon(
+                                _isExpanded
+                                    ? Icons.arrow_drop_up
+                                    : Icons.arrow_drop_down,
                               ),
                             ],
                           ),
                           if (_isExpanded)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Container(
-                              width: 400, decoration: BoxDecoration(
-                               color: const Color(0xffb1d4e0),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                  const SizedBox(width:10),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
                                   Expanded(
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                        labelText: 'Item',
-                                        labelStyle: TextStyle(color: Colors.blueGrey),
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
-                                        ),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: Colors.black45, width:2.0),
-                                        ),
-                                        contentPadding: EdgeInsets.only(bottom:1.0),
-                                        ),
-                                      ),
-                                    ),
-
-                                    const SizedBox(width:10),
-                                    Expanded(
-                                      child: TextField(
-                                        decoration: InputDecoration(
-                                          labelText: 'Category',
-                                          labelStyle: TextStyle(color: Colors.blueGrey),
-                                          enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
-                                          ),
-                                          focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.black45, width:2.0),
-                                          ),
-                                          contentPadding: EdgeInsets.only(bottom:1.0),
-                                        ),
-                                      ),
-                                    ),
-
-                                    const SizedBox(width:10),
-                                    Expanded(
-                                      child: TextField(
-                                        decoration: InputDecoration(
-                                          labelText: 'Amount',
-                                          labelStyle: TextStyle(color: Colors.blueGrey),
-                                          enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
-                                          ),
-                                          focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.black45, width:2.0),
-                                          ),
-                                          contentPadding: EdgeInsets.only(bottom:1.0),
-                                        ),
-                                      ),
-                                    ),
-
-                                    const SizedBox(width:1),
-                                    Container(
-                                      width:30,
-                                      child: ElevatedButton(
+                                    child: ElevatedButton(
                                         onPressed: _toggleCategory,
-                                          style: ElevatedButton.styleFrom(
-                                          shape: CircleBorder(),
-                                          padding: EdgeInsets.all(0),
-                                          ),
-                                        child: const Icon(
-                                          Icons.add,
-                                          color: Colors.black,
-                                        ),
+                                        child: const FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text('Item'),
+                                        )),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _toggleCategory,
+                                      child: const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text('Category'),
                                       ),
                                     ),
-                                    const SizedBox(width:10),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _toggleCategory,
+                                      child: const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text('Amount'),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          ),
-                         ],
-                       ),
-                     ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height:40),
                 ],
               ),
             ],
           ),
+
         ),
+
       ),
     );
   }

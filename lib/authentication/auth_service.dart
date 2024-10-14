@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -23,6 +23,8 @@ class AuthService {
       //Add a potential handling of error like a snackbar or alert
     }
   }
+
+  // updates the password of the user.
   Future<void> updatePassword(String newPassword) async{
     User? user = _auth.currentUser;
     if(user != null){

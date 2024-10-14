@@ -6,9 +6,9 @@ class FirebaseData {
 
   Future<void> addSavingsData({
     required String userId,
-    required int goal,
+    required double goal,
     required int days,
-    required int budget,
+    required double budget,
   }) async {
     try {
       await userData
@@ -50,7 +50,6 @@ class FirebaseData {
   }
 
   // fetches expenses data
-  //TODO Step 2. update data in product.
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchExpensesData(String userId) {
     return userData.doc(userId).collection('expenses').snapshots();
   }
@@ -74,12 +73,14 @@ class FirebaseData {
     }
   }
 
+  // delete data
+
   Future<void> deleteExpensesData(
       {required String userID, required String expenseID}) async {
     try {
       await userData.doc(userID).collection('expenses').doc(expenseID).delete();
     } catch (e) {
-      print('Error deleteing expense: ${e}');
+      print('Error deleting expense: ${e}');
     }
   }
 }

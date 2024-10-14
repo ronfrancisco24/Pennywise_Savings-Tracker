@@ -102,6 +102,7 @@ Future<void> kAddingBottomSheet({
                       Expanded(
                         child: TextField(
                           controller: _priceController,
+                          keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           style: kNormalMontserratBlackMedium,
                           decoration: InputDecoration(
@@ -226,6 +227,7 @@ Future<void> kEditingBottomSheet(
                       Expanded(
                         child: TextField(
                           controller: _priceController,
+                          keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           style: kNormalMontserratBlackMedium,
                           decoration: InputDecoration(

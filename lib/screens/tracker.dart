@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/screens/allocation.dart';
 import 'package:savings_2/widgets/constants.dart';
-import 'home_page.dart';
 import 'package:savings_2/authentication/auth_service.dart';
 import 'package:savings_2/data/firebase_data.dart';
 import 'package:savings_2/widgets/bottomSheet.dart';
+import 'package:savings_2/widgets/personalPrompt.dart';
 
 class TrackerPage extends StatefulWidget {
   @override
@@ -43,99 +43,6 @@ class _TrackerPageState extends State<TrackerPage>
     super.dispose();
   }
 
-  void showPromptPopup(BuildContext context) {
-    TextEditingController targetGoalController = TextEditingController();
-    TextEditingController daysRemainingController = TextEditingController();
-    TextEditingController budgetController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: Text('Enter Your Details'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: targetGoalController,
-                  decoration: InputDecoration(
-                    labelText: 'Target Goal',
-                    hintText: 'e.g., 5000',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: daysRemainingController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Days To Save',
-                    hintText: 'e.g., 30',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: budgetController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Budget',
-                    hintText: 'e.g., 1000',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Retrieve and use values as needed
-                String targetGoal = targetGoalController.text;
-                String daysRemaining = daysRemainingController.text;
-                String budget = budgetController.text;
-
-                // Convert string inputs to integers
-                int? goal = int.tryParse(targetGoal);
-                int? days = int.tryParse(daysRemaining);
-                int? budgetValue = int.tryParse(budget);
-
-                if (goal != null && days != null && budgetValue != null) {
-                  fireStore.addSavingsData(
-                    userId: userID,
-                    goal: goal,
-                    days: days,
-                    budget: budgetValue,
-                  );
-
-                  print('Target Goal: $targetGoal');
-                  print('Days To Save: $daysRemaining');
-                  print('Budget: $budget');
-                } else {
-                  print(
-                      'Please enter valid numbers for goal, days, and budget.');
-                }
-                Navigator.of(context)
-                    .pop(); // Close the dialog after submission
-              },
-              child: Text('Submit'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final username = authService.getUserName();
@@ -165,9 +72,13 @@ class _TrackerPageState extends State<TrackerPage>
         body: StreamBuilder<DocumentSnapshot>(
           stream: fireStore.fetchSavingsData(userID),
           builder: (context, snapshot) {
-            int goal = 0; // Default value
-            int days = 0; // Default value
-            int budget = 0; // Default value
+
+            // Default values
+            int goal = 0;
+            int days = 0;
+            int budget = 0;
+
+            // check connection state
 
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -181,6 +92,7 @@ class _TrackerPageState extends State<TrackerPage>
             } else if (!snapshot.hasData || !snapshot.data!.exists) {
               print('No document exists, using default values.');
             } else {
+
               final data = snapshot.data!.data() as Map<String, dynamic>?;
 
               // Use data if available
@@ -258,12 +170,12 @@ class _TrackerPageState extends State<TrackerPage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '\$ ${budget}',
+                                        '\$ ${budget.toStringAsFixed(2)}',
                                         style: kMontserratWhiteLarge,
                                       ),
                                       Opacity(
                                         opacity: 0.5,
-                                        child: Text('Total Balance',
+                                        child: Text('Total Budget',
                                             style: kMontserratGraySmall),
                                       ),
                                     ],
@@ -304,7 +216,7 @@ class _TrackerPageState extends State<TrackerPage>
                                         style: kNormalSansWhiteMini,
                                       ),
                                       Text(
-                                        '\$ ${goal.toString()}',
+                                        '\$ ${goal.toStringAsFixed(2)}',
                                         style: kNormalSansWhiteSmall,
                                       ),
                                     ],

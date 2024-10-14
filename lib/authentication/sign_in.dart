@@ -214,7 +214,7 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.computer),
+                        icon: Icon(Icons.g_mobiledata_rounded),
                       ),
                     ],
                   )

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
-import '../widgets/constants.dart';
+import 'package:savings_2/widgets/personalPrompt.dart';
 import 'tracker.dart';
+import 'package:savings_2/authentication/auth_service.dart';
 
 class AllocationPage extends StatefulWidget {
-  const AllocationPage({super.key});
+
+  final AuthService authService = AuthService();
 
   @override
   State<AllocationPage> createState() => _AllocationPageState();
@@ -34,14 +36,16 @@ class _AllocationPageState extends State<AllocationPage>
   @override
   void initState() {
     super.initState();
-    int number = 0;
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..addListener(() {
+    final user = authService.getCurrentUser();
+    if (user != null){
+      controller = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 5),
+      )..addListener(() {
         setState(() {});
       });
-    controller.repeat(reverse: false);
+    }
+
   }
 
   @override
@@ -226,49 +230,81 @@ class _AllocationPageState extends State<AllocationPage>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          backgroundColor: Color(0xff81bed4),
-          title: Center(
-            child: Text(
-              '$category',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(             //Container for Priority Level
-                  child: Row(
+          contentPadding: EdgeInsets.all(0),
+          backgroundColor: Colors.transparent,
+          title: SingleChildScrollView(
+            child: Container(
+              decoration: kGradientColors,
+              padding: EdgeInsets.symmetric(horizontal: 16.0), // Set horizontal padding
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Priority Level: ',
-                        style: TextStyle(color: Colors.white),
+                        '$category',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
-                      SizedBox(width: 100),
-                      Text(
-                          '${categoryPriorityMap[category] ?? 'N/A'}', style: TextStyle(color: Colors.white),
+                      SizedBox(height: 20), // Add space between elements
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Priority Level: ',
+                            style: kNormalSansWhiteMini
+                          ),
+                          Text(
+                            '${categoryPriorityMap[category] ?? 'N/A'}',
+                            style: kNormalSansWhiteMini
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              'Subgoal Target: ',
+                              style: kNormalSansWhiteMini
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                                'Recommended Savings: ',
+                                style: kNormalSansWhiteMini
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20), // Adjust spacing
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Close',
+                          style: kNormalSansWhiteSmall,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close', style: TextStyle(color: Colors.white),),
-            ),
-          ],
         );
+
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final username = authService.getUserName();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -283,7 +319,7 @@ class _AllocationPageState extends State<AllocationPage>
                 style: TextStyle(color: Colors.grey),
               ),
               Text(
-                'Aaron',
+                '${username}',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Montserrat'),
               )
@@ -291,291 +327,326 @@ class _AllocationPageState extends State<AllocationPage>
           ),
         ),
         bottomNavigationBar: kBottomAppBar(context),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            children: [
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TrackerPage()),
-                              );
-                            },
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Color(0xffb1d4e0),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Personal',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TrackerPage()),
-                              );
-                            },
-                            child: Container(
-                              height: 50,
-                              decoration: kGradientColors,
-                              child: Center(
-                                child: Text(
-                                  'Budget Allocator',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      width: double.infinity,
-                      margin: EdgeInsets.symmetric(vertical: 20),
-                      padding: EdgeInsets.all(15),
-                      decoration: kGradientColors,
-                      child: Column(
+        body: ListView(
+          children: [ SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '\$ 260.65',
-                                    style: kMontserratWhiteLarge,
-                                  ),
-                                  Opacity(
-                                    opacity: 0.5,
-                                    child: Text('Total Balance',
-                                        style: kMontserratGraySmall),
-                                  ),
-                                ],
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  showPromptPopup(context);
-                                },
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.black,
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TrackerPage()),
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Color(0xffb1d4e0),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                style: ElevatedButton.styleFrom(
-                                    shape: CircleBorder()),
+                                child: Center(
+                                  child: Text(
+                                    'Personal',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
                               ),
-                            ],
+                            ),
                           ),
-                          SizedBox(height: 10),
-                          LinearProgressIndicator(
-                            value: controller.value,
-                            semanticsLabel: 'Linear Progress Indicator',
-                            backgroundColor: Colors.blue[900],
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                          SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Target Goal',
-                                    style: kNormalSansWhiteMini,
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TrackerPage()),
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                decoration: kGradientColors,
+                                child: Center(
+                                  child: Text(
+                                    'Budget Allocator',
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                  Text(
-                                    '\$ 5,000.00',
-                                    style: kNormalSansWhiteSmall,
-                                  ),
-                                ],
+                                ),
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Days Remaining',
-                                    style: kNormalSansWhiteMini,
-                                  ),
-                                  Text(
-                                    '7 days',
-                                    style: kNormalSansWhiteSmall,
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Categories',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      showAnotherPromptPopup(context);
-                    },
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.black,
-                      size: 16,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(10),
-                        minimumSize: Size(30, 30)),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: categoryPriorityMap.keys
-                          .map(
-                            (category) => GestureDetector(
-                          onTap: () {
-                            showCategoryDetailsPopup(context, category);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 15),
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(187, 233, 255, 1.0), // Corrected opacity
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                  offset: Offset(0, 3),
+                      Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.symmetric(vertical: 20),
+                        padding: EdgeInsets.all(15),
+                        decoration: kGradientColors,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '\$ 0',
+                                      style: kMontserratWhiteLarge,
+                                    ),
+                                    Opacity(
+                                      opacity: 0.5,
+                                      child: Text('Total Budget',
+                                          style: kMontserratGraySmall),
+                                    ),
+                                  ],
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    showPromptPopup(context);
+                                  },
+                                  child: Icon(
+                                    Icons.edit_note_rounded,
+                                    color: Colors.black,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    shape: CircleBorder(),
+                                  ),
                                 ),
                               ],
                             ),
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
+                            SizedBox(height: 10),
+                            LinearProgressIndicator(
+                              value: controller.value,
+                              semanticsLabel: 'Linear Progress Indicator',
+                              backgroundColor: Colors.blue[900],
+                              valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
-                          ),
-                        ),
-                      )
-                          .toList(),
-                    ),
-                  ],
-                ),
-              ),
-
-              Column(
-                children: [
-                  Container(
-                    width: _isExpanded ? double.infinity : 500,
-                    height: _isExpanded ? 200 : 60,
-                    child: ElevatedButton(
-                      onPressed: _toggleExpenses,
-                      style: ButtonStyle(
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(_isExpanded ? 20 : 20),
-                          ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Target Goal',
+                                      style: kNormalSansWhiteMini,
+                                    ),
+                                    Text(
+                                      '\$ 0',
+                                      style: kNormalSansWhiteSmall,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Days Remaining',
+                                      style: kNormalSansWhiteMini,
+                                    ),
+                                    Text(
+                                      '0 days',
+                                      style: kNormalSansWhiteSmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 17),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Expenses'),
-                              Icon(
-                                _isExpanded
-                                    ? Icons.arrow_drop_up
-                                    : Icons.arrow_drop_down,
-                              ),
-                            ],
+                      Container(
+                        margin: EdgeInsets.only(bottom: 20),
+                        width: double.infinity,
+                        padding: EdgeInsets.all(15),
+                        decoration: kGradientColors,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Suggested Budget",
+                                    style: kMontserratWhiteMedium),
+                                Text(
+                                  '\$ 0',
+                                  style: kMontserratWhiteMedium,
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Categories',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            showAnotherPromptPopup(context);
+                          },
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.black,
+                            size: 16,
                           ),
-                          if (_isExpanded)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButton(
-                                        onPressed: _toggleCategory,
-                                        child: const FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text('Item'),
-                                        )),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _toggleCategory,
-                                      child: const FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text('Category'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: _toggleCategory,
-                                      child: const FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text('Amount'),
-                                      ),
-                                    ),
+                          style: ElevatedButton.styleFrom(
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(10),
+                              minimumSize: Size(30, 30)),
+                        ),
+                      ],
+                    ),
+                    Text('0/9')
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: categoryPriorityMap.keys
+                            .map(
+                              (category) => GestureDetector(
+                            onTap: () {
+                              showCategoryDetailsPopup(context, category);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(187, 233, 255, 1.0), // Corrected opacity
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 1,
+                                    blurRadius: 3,
+                                    offset: Offset(0, 3),
                                   ),
                                 ],
                               ),
+                              child: Text(
+                                category,
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ),
                             ),
-                        ],
+                          ),
+                        )
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Column(
+                  children: [
+                    Container(
+                      width: _isExpanded ? double.infinity : 500,
+                      height: _isExpanded ? 200 : 60,
+                      child: ElevatedButton(
+                        onPressed: _toggleExpenses,
+                        style: ButtonStyle(
+                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(_isExpanded ? 20 : 20),
+                            ),
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 17),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Expenses'),
+                                Icon(
+                                  _isExpanded
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down,
+                                ),
+                              ],
+                            ),
+                            if (_isExpanded)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton(
+                                          onPressed: _toggleCategory,
+                                          child: const FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text('Item'),
+                                          )),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: _toggleCategory,
+                                        child: const FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text('Category'),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: _toggleCategory,
+                                        child: const FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text('Amount'),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
+        ]),
       ),
     );
   }

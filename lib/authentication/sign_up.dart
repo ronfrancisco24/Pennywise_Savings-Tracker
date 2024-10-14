@@ -307,7 +307,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               IconButton(
                                 onPressed: () {},
-                                icon: Icon(Icons.computer),
+                                icon: Icon(Icons.g_mobiledata_rounded),
                               ),
                             ],
                           )

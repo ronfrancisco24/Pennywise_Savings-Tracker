@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../widgets/constants.dart';
 import 'package:savings_2/authentication/auth_service.dart';
 import 'package:savings_2/authentication/reset_password.dart';
+import 'change_profile_pic.dart';
+import 'dart:io';
 
 
 void main(){
@@ -20,6 +23,29 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
   TextEditingController _emailController = TextEditingController();
   //Authenticating firebase to the personal information
   final AuthService authService = AuthService();
+  //Changing the Profile pic
+  final ChangeProfilePic _profilePicHandler = ChangeProfilePic();
+  File? _profileImage;
+  String? _downloadUrl;
+
+  //Callback to update UI after an image is picked and uploaded
+  void _updateProfilePicture() async{
+    //Trigger profile picture upload
+    await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
+    setState(() {
+      _profileImage = _profilePicHandler.getImage();
+      _downloadUrl = _profilePicHandler.getDownloadUrl();
+    });
+  }
+
+  //Uploading the profile picture to the firebase storage
+  void _uploadProfilePicture() async{
+    await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
+    String? imageUrl = _profilePicHandler.getDownloadUrl();
+    if(imageUrl != null){
+      print('Uploaded Image URL: $imageUrl');
+    }
+  }
 
 
   @override
@@ -70,19 +96,51 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                   child: Center(
                     child: Column(
                       children: [
+                        //Display the current profile image or placeholder if no image is selected
+                        _profileImage != null
+                        ?CircleAvatar(
+                          radius: 60,
+                          backgroundImage: FileImage(_profileImage!),
+                        )
+                        :CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.grey.shade200,
+                          child: Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.grey.shade800,
+                          )
+                        ),
+                        SizedBox(height: 30,),
                         Container(
+                            width: 300,
+                            height: 40,
                             decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.5),
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
-                                    offset: Offset(0,5),
-                                  )
-                                ]
+                              gradient: kLinearGradient,
+                              borderRadius: BorderRadius.circular(20.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  blurStyle: BlurStyle.normal,
+                                ),
+                              ],
                             ),
-                            child: kCircleAvatar),
+                            child: Center(
+                                child: TextButton(
+                                  onPressed:(){
+                                    //Show action sheet to choose image source
+                                    _profilePicHandler.showImageSourceActionSheet(context, _updateProfilePicture);
+                                    },
+                                  child: Text('Change Profile Picture',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontFamily: 'FontsFree',
+                                      fontWeight: FontWeight.normal,
+                                    ),),
+                                )
+                            )
+                        ),
                         Container(
                           margin: EdgeInsets.only(top: 30),
                           width: 300,

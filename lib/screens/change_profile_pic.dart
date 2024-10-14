@@ -10,46 +10,62 @@ class ChangeProfilePic {
   UploadTask? _uploadTask;
 
   //Image picker function
-Future<void> _pickImage(ImageSource source) async{
-  final pickedFile = await ImagePicker().pickImage(source: source);
-  if (pickedFile != null){
-    File? croppedImage = await _cropImage (File(pickedFile.path));
-    if (croppedImage != null){
-      _image = croppedImage;
-      // Upload the file to Firebase storage
-      await _uploadImageToFirebase(_image!);
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await ImagePicker().pickImage(source: source);
+      if (pickedFile != null) {
+        File? croppedImage = await _cropImage(File(pickedFile.path));
+        if (croppedImage != null) {
+          _image = croppedImage;
+          // Upload the file to Firebase storage
+          await _uploadImageToFirebase(_image!);
+        }
+      }
+    } catch (e) {
+      print('Error Picking Image: $e');
     }
   }
-}
-//Image cropping function
-Future<File?> _cropImage(File imageFile) async{
-  CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path);
-  if (croppedFile != null){
-    return File(croppedFile.path);
+
+
+//Public method to expose _pickImage for personal_information
+  Future<void> pickAndUploadImage(ImageSource source) async {
+    await _pickImage(source); //Calls the private method
   }
-  return null;
-}
+
+
+//Image cropping function
+  Future<File?> _cropImage(File imageFile) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.path);
+    if (croppedFile != null) {
+      return File(croppedFile.path);
+    }
+    return null;
+  }
 
 //Function for uploading image to Firebase Storage
-Future<void> _uploadImageToFirebase(File imageFile) async{
-  FirebaseStorage storage = FirebaseStorage.instance;
-  final ref = storage.ref().child('profile_pictures/${_image!.path}'); //directory path for firebase storage
-  _uploadTask = ref.putFile(imageFile);
-  TaskSnapshot? snapshot = await _uploadTask?.whenComplete(() => {});
-  _downloadUrl = await snapshot?.ref.getDownloadURL();
-  print('Image uploaded successfully. URL: $_downloadUrl');
-}
+  Future<void> _uploadImageToFirebase(File imageFile) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    final ref = storage.ref().child('profile_pictures/${_image!
+        .path}'); //directory path for firebase storage
+    _uploadTask = ref.putFile(imageFile);
+    TaskSnapshot? snapshot = await _uploadTask?.whenComplete(() => {});
+    _downloadUrl = await snapshot?.ref.getDownloadURL();
+    print('Image uploaded successfully. URL: $_downloadUrl');
+  }
 
-File? getImage(){
-  return _image;
-}
+  File? getImage() {
+    return _image;
+  }
 
-String? getDownloadUrl(){
-  print('PROFILE PICTURE: $_downloadUrl');
-  return _downloadUrl;
-}
+  String? getDownloadUrl() {
+    print('PROFILE PICTURE: $_downloadUrl');
+    return _downloadUrl;
+  }
+
 // Function to show bottom sheet for image source selection
-  void showImageSourceActionSheet(BuildContext context, void Function() callback) {
+  void showImageSourceActionSheet(BuildContext context,
+      void Function() callback) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {

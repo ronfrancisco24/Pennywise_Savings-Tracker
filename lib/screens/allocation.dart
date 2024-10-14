@@ -446,7 +446,7 @@ class _AllocationPageState extends State<AllocationPage>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Expenses'),
+                              const Text('  Expenses', style: kMontserratBlackMedium),
                               IconButton(
                                 onPressed: () {
                                   _toggleExpenses();

@@ -16,7 +16,8 @@ class _AllocationPageState extends State<AllocationPage>
   bool _categoryExpanded = false;
   late AnimationController controller;
 
-  List<String> categories = []; // List for Categories
+
+  Map<String, int> categoryPriorityMap = {}; //Map is used to associated categories with their corresponding priority levels.
 
   void _toggleExpenses() {
     setState(() {
@@ -38,8 +39,8 @@ class _AllocationPageState extends State<AllocationPage>
       vsync: this,
       duration: const Duration(seconds: 5),
     )..addListener(() {
-      setState(() {});
-    });
+        setState(() {});
+      });
     controller.repeat(reverse: false);
   }
 
@@ -170,20 +171,39 @@ class _AllocationPageState extends State<AllocationPage>
             ),
             TextButton(
               onPressed: () {
-                if (categories.length >= 9) {
+                String categoryInput = categoryInputController.text.trim();
+                String priorityInput = priorityLevelController.text.trim(); //ensures that there is no unwanted space in the input
+
+                if (categoryPriorityMap.length >= 9) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        'The limit is 9 categories, please delete one if you want to add more.',
-                      ),
+                      content: Text('The limit is 9 categories.'),
                     ),
                   );
                   return;
                 }
-                String categoryInput = categoryInputController.text;
+
+                if (categoryInput.isEmpty || priorityInput.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please fill in all fields.'),
+                    ),
+                  );
+                  return;
+                }
+
+                int? priorityValue = int.tryParse(priorityInput);          //Parses the string into int
+                if (priorityValue == null || priorityValue < 1 || priorityValue > 9) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please enter a valid priority between 1 and 9.'),
+                    ),
+                  );
+                  return;
+                }
 
                 setState(() {
-                  categories.add(categoryInput);
+                  categoryPriorityMap[categoryInput] = priorityValue;
                 });
 
                 print('Category: $categoryInput');
@@ -206,12 +226,31 @@ class _AllocationPageState extends State<AllocationPage>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          title: Text('Category: $category'),
+          backgroundColor: Color(0xff81bed4),
+          title: Center(
+            child: Text(
+              '$category',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('This is where details about the category will be shown.'),
+                Container(             //Container for Priority Level
+                  child: Row(
+                    children: [
+                      Text(
+                        'Priority Level: ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(width: 100),
+                      Text(
+                          '${categoryPriorityMap[category] ?? 'N/A'}', style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -220,7 +259,7 @@ class _AllocationPageState extends State<AllocationPage>
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: Text('Close', style: TextStyle(color: Colors.white),),
             ),
           ],
         );
@@ -352,7 +391,7 @@ class _AllocationPageState extends State<AllocationPage>
                             semanticsLabel: 'Linear Progress Indicator',
                             backgroundColor: Colors.blue[900],
                             valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                           SizedBox(height: 20),
                           Row(
@@ -424,7 +463,7 @@ class _AllocationPageState extends State<AllocationPage>
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: categories
+                      children: categoryPriorityMap.keys
                           .map(
                             (category) => GestureDetector(
                           onTap: () {
@@ -434,7 +473,7 @@ class _AllocationPageState extends State<AllocationPage>
                             padding: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 15),
                             decoration: BoxDecoration(
-                              color: Color.fromRGBO(187, 233, 255, 100.0),
+                              color: Color.fromRGBO(187, 233, 255, 1.0), // Corrected opacity
                               borderRadius: BorderRadius.circular(25),
                               boxShadow: [
                                 BoxShadow(
@@ -459,6 +498,7 @@ class _AllocationPageState extends State<AllocationPage>
                   ],
                 ),
               ),
+
               Column(
                 children: [
                   Container(
@@ -470,7 +510,7 @@ class _AllocationPageState extends State<AllocationPage>
                         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius:
-                            BorderRadius.circular(_isExpanded ? 20 : 20),
+                                BorderRadius.circular(_isExpanded ? 20 : 20),
                           ),
                         ),
                       ),
@@ -494,7 +534,7 @@ class _AllocationPageState extends State<AllocationPage>
                               padding: const EdgeInsets.only(top: 10),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: ElevatedButton(
@@ -535,9 +575,7 @@ class _AllocationPageState extends State<AllocationPage>
               ),
             ],
           ),
-
         ),
-
       ),
     );
   }

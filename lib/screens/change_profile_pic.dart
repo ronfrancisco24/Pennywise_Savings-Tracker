@@ -9,28 +9,45 @@ class ChangeProfilePic {
   String? _downloadUrl;
   UploadTask? _uploadTask;
 
-  //Image picker function
+// Image picker function with improved error handling
   Future<void> _pickImage(ImageSource source) async {
     try {
+      // Pick image from the specified source (camera or gallery)
       final pickedFile = await ImagePicker().pickImage(source: source);
-      if (pickedFile != null) {
+
+      // Check if the user actually picked a file (or if the action was canceled)
+      if (pickedFile == null) {
+        print('No image selected or operation canceled.');
+        return; // Return early if no image was selected
+      }
+
+      // Check if the file path is valid and accessible
+      if (pickedFile.path.isNotEmpty) {
         File? croppedImage = await _cropImage(File(pickedFile.path));
+
         if (croppedImage != null) {
           _image = croppedImage;
-          // Upload the file to Firebase storage
+
+          // Proceed to upload the image to Firebase storage
           await _uploadImageToFirebase(_image!);
+          print('Image successfully uploaded.');
+        } else {
+          print('Image cropping canceled or failed.');
         }
+      } else {
+        print('Invalid file path or file not accessible.');
       }
     } catch (e) {
-      print('Error Picking Image: $e');
+      // Catch and print any errors that occur during the image picking process
+      print('Error picking image: $e');
     }
   }
 
-
-//Public method to expose _pickImage for personal_information
+// Public method to expose _pickImage for personal_information
   Future<void> pickAndUploadImage(ImageSource source) async {
-    await _pickImage(source); //Calls the private method
+    await _pickImage(source); // Calls the private method
   }
+
 
 
 //Image cropping function

@@ -12,14 +12,31 @@ class AllocationPage extends StatefulWidget {
   State<AllocationPage> createState() => _AllocationPageState();
 }
 
+class ExpenseData{
+  late String item;
+  late String category;
+  late double amount;
+  ExpenseData({required this.item, required this.category, required this.amount});
+}
+
 class _AllocationPageState extends State<AllocationPage>
     with TickerProviderStateMixin {
   bool _isExpanded = false;
-  bool _categoryExpanded = false;
-  late AnimationController controller;
+  bool _isEditingExpense = false;
 
+  final _itemController = TextEditingController();
+  final _categoryController = TextEditingController();
+  final _amountController = TextEditingController();
+
+  final _editItemController = TextEditingController();
+  final _editCategoryController = TextEditingController();
+  final _editAmountController = TextEditingController();
+
+  late AnimationController controller; //declared variables
 
   Map<String, int> categoryPriorityMap = {}; //Map is used to associated categories with their corresponding priority levels.
+
+  final List<ExpenseData> expenses = []; //expenses list
 
   void _toggleExpenses() {
     setState(() {
@@ -27,10 +44,83 @@ class _AllocationPageState extends State<AllocationPage>
     });
   }
 
-  void _toggleCategory() {
+  void _addExpense(){
+    final String item = _itemController.text;
+    final String category = _categoryController.text;
+    final double? amount = double.tryParse(_amountController.text); //text controllers
+
+    if (item.isNotEmpty && category.isNotEmpty && amount != null){
+      setState((){
+        expenses.add(ExpenseData(item: item, category: category, amount: amount));
+      });
+
+      _clearControllers(); //clear input after adding them
+    }
+  }
+
+  void _editExpense(int index){
+    _editItemController.text = expenses[index].item;
+    _editCategoryController.text = expenses[index].category;
+    _editAmountController.text = expenses[index].amount.toString();
+
+    showDialog(
+        context: context,
+        builder: (context){
+          return AlertDialog(
+              title: Text('Edit Expense'),
+              content: Column(
+              mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _editItemController,
+                    decoration: InputDecoration(labelText: 'Item'),
+                  ),
+                  TextField(
+                    controller: _editCategoryController,
+                    decoration: InputDecoration(labelText: 'Category'),
+                  ),
+                  TextField(
+                    controller: _editAmountController,
+                    decoration: InputDecoration(labelText: 'Amount'),
+                    keyboardType: TextInputType.number,
+                  )
+                ],
+              ),
+            actions: [
+              TextButton(onPressed: (){
+                setState(() {
+                  expenses[index] =ExpenseData(
+                      item: _editItemController.text,
+                      category: _editCategoryController.text,
+                      amount: double.parse(_editAmountController.text),
+                  );
+                }
+              );
+                Navigator.of(context).pop();
+                _clearControllers();
+            },
+                child: Text('Save'),
+              ),
+              TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+          )
+          ],
+        );
+      }
+    );
+  }
+
+  void _deleteExpense(int index) {
     setState(() {
-      _categoryExpanded = !_categoryExpanded;
+      expenses.removeAt(index);
     });
+  }
+
+  void _clearControllers(){
+    _itemController.clear();
+    _categoryController.clear();
+    _amountController.clear();
   }
 
   @override
@@ -45,7 +135,6 @@ class _AllocationPageState extends State<AllocationPage>
         setState(() {});
       });
     }
-
   }
 
   @override
@@ -328,7 +417,8 @@ class _AllocationPageState extends State<AllocationPage>
         ),
         bottomNavigationBar: kBottomAppBar(context),
         body: ListView(
-          children: [ SingleChildScrollView(
+          children: [
+            SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
@@ -583,85 +673,202 @@ class _AllocationPageState extends State<AllocationPage>
                   ),
                 ),
 
-                Column(
+                GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: Column(
                   children: [
                     Container(
                       width: _isExpanded ? double.infinity : 500,
-                      height: _isExpanded ? 200 : 60,
-                      child: ElevatedButton(
-                        onPressed: _toggleExpenses,
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(_isExpanded ? 20 : 20),
-                            ),
-                          ),
+                      height: _isExpanded ? 400 : 75, //adjust height here if needed
+                      child: Container( // Toggles expenses expanding
+                        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            SizedBox(height: 17),
+                            const SizedBox(height: 7),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Expenses'),
-                                Icon(
-                                  _isExpanded
-                                      ? Icons.arrow_drop_up
-                                      : Icons.arrow_drop_down,
+                                const Text('Expenses', style: kMontserratBlackMedium),
+                                IconButton(
+                                  onPressed: () {
+                                    _toggleExpenses();
+                                  },
+                                  icon: Icon(
+                                    _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                  ),
                                 ),
                               ],
                             ),
                             if (_isExpanded)
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                          onPressed: _toggleCategory,
-                                          child: const FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text('Item'),
-                                          )),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: _toggleCategory,
-                                        child: const FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text('Category'),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: _toggleCategory,
-                                        child: const FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text('Amount'),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                child: GestureDetector(
+                                  onTap: () {
+                                    FocusScope.of(context).unfocus();
+                                  },
+                                child: Container(
+                                  width: 400, decoration: BoxDecoration(
+                                  color: const Color(0xffb1d4e0),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const SizedBox(width:10),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _itemController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Item',
+                                            labelStyle: TextStyle(color: Colors.blueGrey),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                            ),
+                                            focusedBorder: const UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                            ),
+                                            contentPadding: EdgeInsets.only(bottom:1.0),
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width:10),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _categoryController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Category',
+                                            labelStyle: const TextStyle(color: Colors.blueGrey),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                            ),
+                                            focusedBorder: const UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                            ),
+                                            contentPadding: EdgeInsets.only(bottom:1.0),
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width:10),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _amountController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Amount',
+                                            labelStyle: TextStyle(color: Colors.blueGrey),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                            ),
+                                            focusedBorder: const UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                            ),
+                                            contentPadding: EdgeInsets.only(bottom:1.0),
+                                          ),
+                                          keyboardType: TextInputType.number,
+                                        ),
+                                      ),
+
+                                      const SizedBox(width:1),
+                                      Container(
+                                        width:30,
+                                        child: ElevatedButton(
+                                          onPressed: _isEditingExpense ? () {} : _addExpense,
+                                          style: ElevatedButton.styleFrom(
+                                            shape: CircleBorder(),
+                                            padding: EdgeInsets.all(0),
+                                          ),
+                                          child: const Icon(
+                                            Icons.add,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width:10),
+
+                                    ],
+                                  ),
+                                ),
+                                  ),
                               ),
-                          ],
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: expenses.length,
+                                itemBuilder: (context,index){
+                                  final expense = expenses[index];
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal:10),
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                            gradient: kLinearGradient,
+                                            borderRadius: BorderRadius.circular(10)
+                                        ),
+                                      child: ListTile(
+                                      title: Text(expense.item, style: kMontserratWhiteMedium),
+                                      subtitle: Text(expense.category, style: kNormalSansWhiteMini),
+                                      trailing: Row(
+                                        mainAxisSize:MainAxisSize.min,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 8.0),
+                                            child: Text('\$${expense.amount.toStringAsFixed(2)}', style: kNormalSansWhiteMini),
+                                          ),
+                                          PopupMenuButton<String>(
+                                              icon: const Icon(Icons.more_vert, color: Colors.white),
+                                              itemBuilder: (BuildContext context){
+                                                return [
+                                                  const PopupMenuItem<String>(
+                                                    value: 'edit',
+                                                    child: Text('Edit'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
+                                                    value: 'delete',
+                                                    child: Text('Delete'),
+                                                  ),
+                                                ];
+                                              },
+                                              onSelected:(value){
+                                                if (value == 'edit') {
+                                                  _editExpense(index);
+                                                }
+                                                else if (value == 'delete') {
+                                                  _deleteExpense(index);
+                                                }
+                                              }
+                                          )
+                                        ],
+                                      ),
+                                    )),
+                                  );
+                                },
+                              ),
+
+                            ),
+                            const SizedBox(height:20),
+                            ],
+                          ),
                         ),
+
                       ),
-                    ),
+
+                    const SizedBox(height:40),
+
                   ],
+                )
                 ),
               ],
-            ),
+            )
           ),
-        ]),
+        ],
       ),
-    );
+    ),);
   }
 }

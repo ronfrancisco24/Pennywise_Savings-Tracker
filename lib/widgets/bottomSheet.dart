@@ -36,7 +36,8 @@ Future<void> kAddingBottomSheet({
                   'Input Expense',
                   style: kNormalMontserratBlackMedium,
                 ),
-                IconButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(shape: CircleBorder()),
                   onPressed: () async {
                     String product = _productController.text;
                     String priceText = _priceController.text;
@@ -62,7 +63,7 @@ Future<void> kAddingBottomSheet({
                           SnackBar(content: Text("Please fill in all fields")));
                     }
                   },
-                  icon: Icon(Icons.add),
+                  child: Icon(Icons.add, color: kBlueColor,),
                 ),
               ],
             ),

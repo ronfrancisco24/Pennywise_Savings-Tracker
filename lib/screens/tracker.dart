@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:savings_2/algorithms/coin_change.dart';
 import 'package:savings_2/screens/allocation.dart';
 import 'package:savings_2/widgets/constants.dart';
 import 'package:savings_2/authentication/auth_service.dart';
 import 'package:savings_2/data/firebase_data.dart';
 import 'package:savings_2/widgets/bottomSheet.dart';
+import 'package:savings_2/widgets/expensesPopup.dart';
 import 'package:savings_2/widgets/personalPrompt.dart';
 
 class TrackerPage extends StatefulWidget {
@@ -18,6 +20,8 @@ class _TrackerPageState extends State<TrackerPage>
   final AuthService authService = AuthService();
   final FirebaseData fireStore = FirebaseData();
   late String userID;
+  late CoinChange savingsTracker;
+  int currentDay = 0;
 
   @override
   void initState() {
@@ -74,9 +78,9 @@ class _TrackerPageState extends State<TrackerPage>
           builder: (context, snapshot) {
 
             // Default values
-            int goal = 0;
+            double goal = 0;
             int days = 0;
-            int budget = 0;
+            double budget = 0;
 
             // check connection state
 
@@ -97,9 +101,9 @@ class _TrackerPageState extends State<TrackerPage>
 
               // Use data if available
               if (data != null) {
-                goal = data['goal'] ?? 0;
-                days = data['days'] ?? 0;
-                budget = data['budget'] ?? 0;
+                goal = (data['goal'] ?? 0).toDouble();
+                days = (data['days'] ?? 0).toInt();
+                budget = (data['budget'] ?? 0).toDouble();
               }
             }
 
@@ -170,12 +174,12 @@ class _TrackerPageState extends State<TrackerPage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '\$ ${budget.toStringAsFixed(2)}',
+                                        '₽ 0.00',
                                         style: kMontserratWhiteLarge,
                                       ),
                                       Opacity(
                                         opacity: 0.5,
-                                        child: Text('Total Budget',
+                                        child: Text('Total Saved',
                                             style: kMontserratGraySmall),
                                       ),
                                     ],
@@ -212,11 +216,25 @@ class _TrackerPageState extends State<TrackerPage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
+                                        'Budget',
+                                        style: kNormalSansWhiteMini,
+                                      ),
+                                      Text(
+                                        '₽${budget.toStringAsFixed(2)}',
+                                        style: kNormalSansWhiteSmall,
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
                                         'Target Goal',
                                         style: kNormalSansWhiteMini,
                                       ),
                                       Text(
-                                        '\$ ${goal.toStringAsFixed(2)}',
+                                        '₽${goal.toStringAsFixed(2)}',
                                         style: kNormalSansWhiteSmall,
                                       ),
                                     ],
@@ -263,7 +281,7 @@ class _TrackerPageState extends State<TrackerPage>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Suggested Budget",
+                                  Text("Today's Budget",
                                       style: kMontserratWhiteMedium),
                                   Text(
                                     '\$ 0',
@@ -288,6 +306,19 @@ class _TrackerPageState extends State<TrackerPage>
                                   },
                                   child: Icon(
                                     Icons.add,
+                                    color: Colors.black,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      shape: CircleBorder()),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    showDialog(context: context, builder: (BuildContext){
+                                      return expenseOutput();
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.info_outline,
                                     color: Colors.black,
                                   ),
                                   style: ElevatedButton.styleFrom(

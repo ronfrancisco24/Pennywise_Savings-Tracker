@@ -401,12 +401,12 @@ class _AllocationPageState extends State<AllocationPage>
                                   CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '\$ 0',
+                                      '₽ 0.00',
                                       style: kMontserratWhiteLarge,
                                     ),
                                     Opacity(
                                       opacity: 0.5,
-                                      child: Text('Total Budget',
+                                      child: Text('Total Saved',
                                           style: kMontserratGraySmall),
                                     ),
                                   ],
@@ -443,11 +443,25 @@ class _AllocationPageState extends State<AllocationPage>
                                   CrossAxisAlignment.start,
                                   children: [
                                     Text(
+                                      'Budget',
+                                      style: kNormalSansWhiteMini,
+                                    ),
+                                    Text(
+                                      '₽0.00',
+                                      style: kNormalSansWhiteSmall,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
                                       'Target Goal',
                                       style: kNormalSansWhiteMini,
                                     ),
                                     Text(
-                                      '\$ 0',
+                                      '₽0.00',
                                       style: kNormalSansWhiteSmall,
                                     ),
                                   ],
@@ -482,7 +496,7 @@ class _AllocationPageState extends State<AllocationPage>
                               mainAxisAlignment:
                               MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Suggested Budget",
+                                Text("Today's Budget",
                                     style: kMontserratWhiteMedium),
                                 Text(
                                   '\$ 0',

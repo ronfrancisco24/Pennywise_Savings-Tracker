@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/constants.dart';
@@ -5,6 +6,7 @@ import 'package:savings_2/authentication/auth_service.dart';
 import 'package:savings_2/authentication/reset_password.dart';
 import 'change_profile_pic.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 
 void main(){
@@ -23,29 +25,33 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
   TextEditingController _emailController = TextEditingController();
   //Authenticating firebase to the personal information
   final AuthService authService = AuthService();
-  //Changing the Profile pic
-  final ChangeProfilePic _profilePicHandler = ChangeProfilePic();
-  File? _profileImage;
-  String? _downloadUrl;
 
-  //Callback to update UI after an image is picked and uploaded
-  void _updateProfilePicture() async{
-    //Trigger profile picture upload
-    await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
-    setState(() {
-      _profileImage = _profilePicHandler.getImage();
-      _downloadUrl = _profilePicHandler.getDownloadUrl();
-    });
-  }
+  XFile? image;
+  UploadTask? uploadTask;
 
-  //Uploading the profile picture to the firebase storage
-  void _uploadProfilePicture() async{
-    await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
-    String? imageUrl = _profilePicHandler.getDownloadUrl();
-    if(imageUrl != null){
-      print('Uploaded Image URL: $imageUrl');
-    }
-  }
+  // //Changing the Profile pic
+  // final ChangeProfilePic _profilePicHandler = ChangeProfilePic();
+  // File? _profileImage;
+  // String? _downloadUrl;
+  //
+  // //Callback to update UI after an image is picked and uploaded
+  // void _updateProfilePicture() async{
+  //   //Trigger profile picture upload
+  //   await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
+  //   setState(() {
+  //     _profileImage = _profilePicHandler.getImage();
+  //     _downloadUrl = _profilePicHandler.getDownloadUrl();
+  //   });
+  // }
+  //
+  // //Uploading the profile picture to the firebase storage
+  // void _uploadProfilePicture() async{
+  //   await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
+  //   String? imageUrl = _profilePicHandler.getDownloadUrl();
+  //   if(imageUrl != null){
+  //     print('Uploaded Image URL: $imageUrl');
+  //   }
+  // }
 
 
   @override
@@ -66,6 +72,16 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
   }
   //Saving changes to Firebase
   Future<void> _saveChanges()async{
+    //Start of profile pic
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child("images/${image!.name}");
+    
+    uploadTask = ref.putFile(File(image!.path));
+    final snapshot = await uploadTask!.whenComplete(() => null);
+
+    final downloadUrl = await snapshot.ref.getDownloadURL();
+    //End of profile pic
     String newName = _nameController.text.trim();
     String newEmail = _emailController.text.trim();
     if (newName.isNotEmpty){
@@ -97,10 +113,10 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                     child: Column(
                       children: [
                         //Display the current profile image or placeholder if no image is selected
-                        _profileImage != null
+                        image != null
                         ?CircleAvatar(
                           radius: 60,
-                          backgroundImage: FileImage(_profileImage!),
+                          backgroundImage: FileImage(File(image!.path)),
                         )
                         :CircleAvatar(
                           radius: 60,
@@ -127,9 +143,19 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
                             ),
                             child: Center(
                                 child: TextButton(
-                                  onPressed:(){
-                                    //Show action sheet to choose image source
-                                    _profilePicHandler.showImageSourceActionSheet(context, _updateProfilePicture);
+                                  onPressed:() async{
+                                    // //Show action sheet to choose image source
+                                    // _profilePicHandler.showImageSourceActionSheet(context, _updateProfilePicture);
+
+                                    //Updated version of the imagepicker
+                                    final picture = await ImagePicker()
+                                        .pickImage(source: ImageSource.gallery);
+                                    if(picture!=null){
+                                      image = picture;
+                                      setState(() {
+
+                                      });
+                                    }
                                     },
                                   child: Text('Change Profile Picture',
                                     style: TextStyle(

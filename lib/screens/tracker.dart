@@ -20,8 +20,10 @@ class _TrackerPageState extends State<TrackerPage>
   final AuthService authService = AuthService();
   final FirebaseData fireStore = FirebaseData();
   late String userID;
-  late CoinChange savingsTracker;
-  int currentDay = 0;
+  late String expenseID;
+
+  double todaysBudget = 0;
+  double todaysGoal = 0;
 
   @override
   void initState() {
@@ -76,11 +78,12 @@ class _TrackerPageState extends State<TrackerPage>
         body: StreamBuilder<DocumentSnapshot>(
           stream: fireStore.fetchSavingsData(userID),
           builder: (context, snapshot) {
-
             // Default values
             double goal = 0;
             int days = 0;
             double budget = 0;
+            double totalExpenses = 0;
+            double totalSaved = 0;
 
             // check connection state
 
@@ -96,7 +99,6 @@ class _TrackerPageState extends State<TrackerPage>
             } else if (!snapshot.hasData || !snapshot.data!.exists) {
               print('No document exists, using default values.');
             } else {
-
               final data = snapshot.data!.data() as Map<String, dynamic>?;
 
               // Use data if available
@@ -104,272 +106,296 @@ class _TrackerPageState extends State<TrackerPage>
                 goal = (data['goal'] ?? 0).toDouble();
                 days = (data['days'] ?? 0).toInt();
                 budget = (data['budget'] ?? 0).toDouble();
+
+                final CoinCalculator calculator = CoinCalculator(
+                    availableBudget: budget, targetGoal: goal, days: days);
+
+                List<double> dailyBudgets = calculator.calculateDailyBudgets();
+                todaysBudget = dailyBudgets.isNotEmpty ? dailyBudgets[0] : 0;
+
+                List<double> dailyGoals = calculator.calculateDailyGoal();
+                todaysGoal = dailyGoals.isNotEmpty ? dailyGoals[0] : 0;
+
               }
             }
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Row(
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: fireStore.fetchExpensesData(userID),
+                builder: (context, snapshot) {
+                  var expenses = snapshot.data!.docs;
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    print('snapshot ${snapshot.error}');
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    print('No expenses data found.');
+                  }
+
+                  // Calculate total expenses
+                  totalExpenses = 0.0; // Initialize total expenses
+                  for (var expense in expenses) {
+                    var expenseData = expense.data();
+                    double price = expenseData['price'] ?? 0.0; // Get price
+                    totalExpenses += price; // Add to total
+                  }
+
+
+                  return Column(
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () {},
-                                child: Container(
-                                  height: 50,
-                                  decoration: kGradientColors,
-                                  child: Center(
-                                    child: Text(
-                                      'Personal',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => AllocationPage()),
-                                  );
-                                },
-                                child: Container(
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffb1d4e0),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'Budget Allocator',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          width: double.infinity,
-                          margin: EdgeInsets.symmetric(vertical: 20),
-                          padding: EdgeInsets.all(15),
-                          decoration: kGradientColors,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '₽ 0.00',
-                                        style: kMontserratWhiteLarge,
-                                      ),
-                                      Opacity(
-                                        opacity: 0.5,
-                                        child: Text('Total Saved',
-                                            style: kMontserratGraySmall),
-                                      ),
-                                    ],
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      showPromptPopup(context);
-                                    },
-                                    child: Icon(
-                                      Icons.edit_note_rounded,
-                                      color: Colors.black,
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      shape: CircleBorder(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              LinearProgressIndicator(
-                                value: controller.value,
-                                semanticsLabel: 'Linear Progress Indicator',
-                                backgroundColor: Colors.blue[900],
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                              SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Budget',
-                                        style: kNormalSansWhiteMini,
-                                      ),
-                                      Text(
-                                        '₽${budget.toStringAsFixed(2)}',
-                                        style: kNormalSansWhiteSmall,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Target Goal',
-                                        style: kNormalSansWhiteMini,
-                                      ),
-                                      Text(
-                                        '₽${goal.toStringAsFixed(2)}',
-                                        style: kNormalSansWhiteSmall,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Days Remaining',
-                                        style: kNormalSansWhiteMini,
-                                      ),
-                                      Text(
-                                        '${days} days',
-                                        style: kNormalSansWhiteSmall,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(bottom: 20),
-                          width: double.infinity,
-                          padding: EdgeInsets.all(15),
-                          decoration: kGradientColors,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Today's Target",
-                                      style: kMontserratWhiteMedium),
-                                  Text(
-                                    '\$ 0',
-                                    style: kMontserratWhiteMedium,
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Today's Budget",
-                                      style: kMontserratWhiteMedium),
-                                  Text(
-                                    '\$ 0',
-                                    style: kMontserratWhiteMedium,
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Total Expenses',
-                                style: kMontserratBlackMedium),
                             Row(
                               children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    kAddingBottomSheet(
-                                        context: context, userId: userID);
-                                  },
-                                  child: Icon(
-                                    Icons.add,
-                                    color: Colors.black,
+                                Expanded(
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    child: Container(
+                                      height: 50,
+                                      decoration: kGradientColors,
+                                      child: Center(
+                                        child: Text(
+                                          'Personal',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  style: ElevatedButton.styleFrom(
-                                      shape: CircleBorder()),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showDialog(context: context, builder: (BuildContext){
-                                      return expenseOutput();
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.info_outline,
-                                    color: Colors.black,
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AllocationPage()),
+                                      );
+                                    },
+                                    child: Container(
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xffb1d4e0),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Budget Allocator',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  style: ElevatedButton.styleFrom(
-                                      shape: CircleBorder()),
                                 ),
                               ],
-                            )
+                            ),
+                            Container(
+                              width: double.infinity,
+                              margin: EdgeInsets.symmetric(vertical: 20),
+                              padding: EdgeInsets.all(15),
+                              decoration: kGradientColors,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '₽ 0.00',
+                                            style: kMontserratWhiteLarge,
+                                          ),
+                                          Opacity(
+                                            opacity: 0.5,
+                                            child: Text('Total Saved',
+                                                style: kMontserratGraySmall),
+                                          ),
+                                        ],
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          showPromptPopup(context);
+                                        },
+                                        child: Icon(
+                                          Icons.edit_note_rounded,
+                                          color: Colors.black,
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          shape: CircleBorder(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  LinearProgressIndicator(
+                                    value: goal > 0 ? totalSaved / goal : 0,
+                                    semanticsLabel: 'Linear Progress Indicator',
+                                    backgroundColor: Colors.blue[900],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                  SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Budget',
+                                            style: kNormalSansWhiteMini,
+                                          ),
+                                          Text(
+                                            '₽${budget.toStringAsFixed(2)}',
+                                            style: kNormalSansWhiteSmall,
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Target Goal',
+                                            style: kNormalSansWhiteMini,
+                                          ),
+                                          Text(
+                                            '₽${goal.toStringAsFixed(2)}',
+                                            style: kNormalSansWhiteSmall,
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Days Remaining',
+                                            style: kNormalSansWhiteMini,
+                                          ),
+                                          Text(
+                                            '${days} days',
+                                            style: kNormalSansWhiteSmall,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(bottom: 20),
+                              width: double.infinity,
+                              padding: EdgeInsets.all(15),
+                              decoration: kGradientColors,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Today's Target",
+                                          style: kMontserratWhiteMedium),
+                                      Text(
+                                        '\$ ${todaysGoal.toStringAsFixed(2)}',
+                                        style: kMontserratWhiteMedium,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Today's Budget",
+                                          style: kMontserratWhiteMedium),
+                                      Text(
+                                        '\$ ${todaysBudget.toStringAsFixed(2)}',
+                                        style: kMontserratWhiteMedium,
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Total Expenses',
+                                    style: kMontserratBlackMedium),
+                                Row(
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        kAddingBottomSheet(
+                                            context: context, userId: userID);
+                                      },
+                                      child: Icon(
+                                        Icons.add,
+                                        color: Colors.black,
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                          shape: CircleBorder()),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext) {
+                                              return expenseOutput(totalExpenses);
+                                            });
+                                      },
+                                      child: Icon(
+                                        Icons.info_outline,
+                                        color: Colors.black,
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                          shape: CircleBorder()),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 10),
                           ],
                         ),
-                        SizedBox(height: 10),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: fireStore.fetchExpensesData(userID),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-
-                        if (snapshot.hasError) {
-                          print('snapshot ${snapshot.error}');
-                        }
-
-                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          print('No expenses data found.');
-                        }
-
-                        var expenses = snapshot.data!.docs;
-                        return ListView.builder(
+                      ),
+                      Expanded(
+                        child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: expenses.length,
                           itemBuilder: (context, index) {
+                            var expenseData = expenses[index].data();
+                            String product = expenseData[
+                            'product']; // takes the product field
+                            double price =
+                            expenseData['price']; // takes the price field
+                            var expenseID = expenses[index].id;
+
                             // Ensure expenses[index] is not null
                             if (expenses[index] == null) {
-                              return SizedBox.shrink(); // Return an empty widget if the expense is null
+                              return SizedBox
+                                  .shrink(); // Return an empty widget if the expense is null
                             }
-
-                            var expenseData = expenses[index].data();
 
                             // Check if expenseData is not null
                             if (expenseData == null) {
-                              return SizedBox.shrink(); // Return an empty widget if the expenseData is null
+                              return SizedBox
+                                  .shrink(); // Return an empty widget if the expenseData is null
                             }
-
-                            String product = expenseData[
-                                'product']; // takes the product field
-                            double price =
-                                expenseData['price']; // takes the price field
-                            var expenseID = expenses[index].id;
 
                             return Padding(
                               padding:
@@ -390,11 +416,16 @@ class _TrackerPageState extends State<TrackerPage>
                                   ElevatedButton(
                                     onPressed: () async {
                                       await kEditingBottomSheet(
-                                      context: context, // Pass the context
-                                      userId: userID, // Ensure you pass the user ID
-                                      expenseId: expenseID, // Pass the expense ID
-                                      currentProduct: product, // Pass the current product name
-                                      currentPrice: price, // Pass the current price
+                                        context: context,
+                                        // Pass the context
+                                        userId: userID,
+                                        // Ensure you pass the user ID
+                                        expenseId: expenseID,
+                                        // Pass the expense ID
+                                        currentProduct: product,
+                                        // Pass the current product name
+                                        currentPrice:
+                                            price, // Pass the current price
                                       );
                                     },
                                     child: Icon(
@@ -406,7 +437,8 @@ class _TrackerPageState extends State<TrackerPage>
                                   ),
                                   ElevatedButton(
                                     onPressed: () async {
-                                      await fireStore.deleteExpensesData(userID: userID, expenseID: expenseID);
+                                      await fireStore.deleteExpensesData(
+                                          userID: userID, expenseID: expenseID);
                                     },
                                     child: Icon(
                                       Icons.delete,
@@ -419,11 +451,11 @@ class _TrackerPageState extends State<TrackerPage>
                               ),
                             );
                           },
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             );
           },
@@ -432,3 +464,8 @@ class _TrackerPageState extends State<TrackerPage>
     );
   }
 }
+
+//TODO: create a function that sums all data and store into amount spent parameter
+//TODO: leaderboard implementation
+//TODO: knapsack algorithm
+//TODO: allocator implementation

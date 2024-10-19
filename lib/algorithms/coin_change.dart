@@ -1,93 +1,137 @@
-import 'package:flutter/material.dart';
+import 'package:savings_2/data/expense.dart';
+import 'decision_tree.dart';
 
-void main() {
-  CoinChange coinChange =
-      CoinChange(availableBudget: 1000.0, targetGoal: 500.0, days: 5);
-
-  // log an expense
-  coinChange.logExpense(2, 100);
-
-  // Print the adjusted savings goals for each day
-  print("Adjusted daily goals (dp): ${coinChange.dp}");
-
-  // Check if the goal is reachable
-  if (coinChange.isGoalReachable()) {
-    print('goal is reachable.');
-  } else {
-    print('goal is not reachable');
-  }
-}
-
-class CoinChange {
+class CoinCalculator {
   double availableBudget;
   double targetGoal;
   int days;
-  List<double> expenses = []; // array to track expenses
-  // dp for dynamic programming
-  List<double> dp =
-      []; // represents the savings needed, to adjust for savings goal
-  double dailyGoal = 0;
+  List<Expense> expenses = [];
+  List<double> dailyBudgets = [];
+  List<double> dailySavings = [];
+  double totalSaved = 0;
+  DateTime startDate;
 
-  CoinChange(
-      {required this.availableBudget,
-      required this.targetGoal,
-      required this.days}) {
-    dailyGoal = targetGoal / days;
-    dp = List.filled(days, dailyGoal);
-    expenses = List.filled(days, 0);
+  DecisionTree decisionTree = DecisionTree();
+
+  CoinCalculator({
+    required this.availableBudget,
+    required this.targetGoal,
+    required this.days,
+  }) : startDate = DateTime.now() {
+    calculateDailyGoal();
+    calculateDailyBudgets();
   }
 
-  void logExpense(int day, double amountSpent) {
-    expenses[day] += amountSpent;
+  // Initialize daily goals for each day
+  List<double> calculateDailyGoal() {
+    double dailyGoal = targetGoal / days;
+    // Fill list with daily goal for each day
+    for (int i = 0; i < days; i++){
+      dailySavings.add(dailyGoal);
+    }
+    return dailySavings;
+  }
 
-    // calculate the excess or shortfall amount for the day
-    double difference = (dailyGoal - expenses[day]);
+  // Initialize daily budgets for each day
+  List<double> calculateDailyBudgets() {
+    double dailyBudget = (availableBudget - targetGoal) / days;
+     // Fill list with daily budget for each day
+    for (int i = 0; i < days; i++){
+      dailyBudgets.add(dailyBudget);
+    }
+    return dailyBudgets;
+  }
 
-    double totalRemainingGoal = (targetGoal - expenses.reduce((a, b) => a + b));
-    double remainingDays = days - day - 1;
+  void adjustBudgetsAndGoals() {
 
-    // Update future daily goals if remaining days are positive
-    if (remainingDays > 0) {
-      double newDailyGoal = totalRemainingGoal / remainingDays;
-      for (int i = day + 1; i < days; i++) {
-        dp[i] = newDailyGoal;
+    int currentDay = expenses.length - 1; // Get the current day index based on expenses
+    int remainingDays = days - (currentDay + 1); // Calculate the remaining days after today
+    if (expenses[currentDay].price == 0) return; // No expenses to adjust against
+
+    double currentSpending = expenses[currentDay].price;
+
+    // keep track of expense on last day, whether if target is reachable based on expense
+    if (currentDay == days - 1){
+        double lastExtra = currentSpending - dailyBudgets[currentDay];
+        double adjustment = lastExtra / (remainingDays + 1);
+
+        // Adjust the last day's budget and savings goal
+        dailyBudgets[currentDay] -= adjustment; // Decrease budget for last day
+        dailySavings[currentDay] += adjustment; // Increase savings goal for last day
+    } else if (remainingDays > 0) {
+      double extra = expenses[currentDay].price - dailyBudgets[currentDay];
+      double adjustment = extra / remainingDays;
+
+      // Adjust the subsequent days' budgets and goals
+      for (int i = currentDay + 1; i < days; i++) {
+        dailyBudgets[i] -= adjustment; // Decrease budget for subsequent days
+        dailySavings[i] += adjustment; // Increase savings goal for subsequent days
+        decisionTree.evaluate(currentSpending, dailyBudgets[i], dailySavings[i]); // evaluates spendings.
       }
-
-      // adjust future daily goals based on the difference
-      // for (int i = day + 1; i<days;i++){
-      //   dp[i] = (dp[i - 1] + difference).clamp(0.0, double.infinity);
-      // clamps the values so that it wont go below 0
-      // num clamp(num lowerLimit, num upperLimit)
-    }
-
-    // dp[i] represents the adjusted savings goal for day i.
-    // dp[i - 1]: This gets the previously calculated goal for the day before
-    // (the previous day).
-    // difference: This is the amount by which the user's expenses exceeded
-    // the daily savings goal for the current day.
-  }
-
-  double suggestedBudgetForToday(int day) {
-    return dp[day]; // return the adjusted savings goal for the current day.
-  }
-
-  // to reset expenses for each day
-  void resetDailyExpense() {
-    for (int i = 0; i < days; i++) {
-      expenses[i] = 0;
     }
   }
 
+  // Method to add an expense
+  void addExpense(String id, String name, double amount, int day) {
+    if (day >= 0 && day < days){
+      expenses.add(Expense(id: id, product: name, price: amount));
+      adjustBudgetsAndGoals(); // Adjust values after adding expense
+    } else {
+      print('invalid index.');
+    }
+
+  }
+
+  void calculateSavings(){
+    totalSaved = dailySavings.reduce((a, b) => a + b); // adds daily savings to total saved.
+  }
+
+  // Calculate the total amount spent so far
+  double amountSpent() {
+    return expenses.fold(0, (sum, expense) => sum + expense.price);
+  }
+
+  // Check if the savings goal is still reachable
   bool isGoalReachable() {
-    double totalSpent = expenses.reduce((a, b) => a + b); // adds all expenses
-    // if total spent is less than availableBudget, goal is still reachable.
-    return (availableBudget - totalSpent) >=
-        targetGoal; // check if remaining budget meets or exceeds target
+    double totalExpenses = amountSpent();
+    double remainingBudget = availableBudget - totalExpenses;
+    return remainingBudget >= targetGoal;
   }
 
-  void reset() {
-    availableBudget = 0;
-    targetGoal = 0;
-    days = 0;
+  // Method to display progress as a linear bar
+  void displayProgress() {
+    double progressPercentage = (totalSaved / targetGoal) * 100;
+    int barLength = 20; // Length of the progress bar
+    int filledLength = (barLength * progressPercentage / 100).round();
+    String bar = '█' * filledLength + '-' * (barLength - filledLength);
+
+    print('Savings Progress: |$bar| $progressPercentage%');
   }
+
+}
+
+void main() {
+  // Example usage
+  var calculator = CoinCalculator(
+    availableBudget: 400,
+    targetGoal: 300,
+    days: 2,
+  );
+
+  // Initial values before any expense
+  print('Initial Daily Goals: ${calculator.dailySavings}');
+  print('Initial Daily Budgets: ${calculator.dailyBudgets}');
+  print('Initial Total Saved: ${calculator.totalSaved}');
+
+  // Simulate expenses
+  calculator.addExpense('001', 'Coffee', 43, 0); // day 1
+  calculator.addExpense('001', 'Coffee', 100, 0); // day 1
+  calculator.addExpense('001', 'Coffee', 43, 1); // day 1
+  calculator.calculateSavings();
+
+  // Recalculate values after the expenses
+  print('Daily Goals after expenses: ${calculator.dailySavings}');
+  print('Daily Budgets after expenses: ${calculator.dailyBudgets}');
+  print('Total Saved after expenses: ${calculator.totalSaved}');
+  print('Is goal reachable? ${calculator.isGoalReachable()}');
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
 
-Dialog expenseOutput() {
+Dialog expenseOutput(double amountSpent) {
   return Dialog(
     backgroundColor: Colors.transparent,
     child: Container(
-      width: 500, // Increase width as needed
+      width: 500,
       padding: EdgeInsets.all(50),
       decoration: BoxDecoration(
         gradient: kLinearGradient,
@@ -15,9 +15,13 @@ Dialog expenseOutput() {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Amount spent: ', style: kNormalSansWhiteMini,),
-          SizedBox(height: 10),
-          Text('Current Budget for Today: ', style: kNormalSansWhiteMini),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+            Text('Amount spent: ', style: kNormalSansWhiteMini,),
+            Text('₽ ${amountSpent}', style: kNormalSansWhiteMini,),
+          ],)
+
         ],
       ),
     ),

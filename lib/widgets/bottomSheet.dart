@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'constants.dart';
-import 'package:savings_2/data/firebase_data.dart'
-    as db; // Import your FirebaseData file
+import 'package:savings_2/data/firebase_data.dart' as db;
+import 'package:savings_2/algorithms/coin_change.dart';
 
 // bottom sheet for adding expenses
 Future<void> kAddingBottomSheet({

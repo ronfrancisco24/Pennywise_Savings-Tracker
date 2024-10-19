@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
 import 'package:savings_2/widgets/personalPrompt.dart';
@@ -36,7 +38,13 @@ class _AllocationPageState extends State<AllocationPage>
 
   Map<String, int> categoryPriorityMap = {}; //Map is used to associated categories with their corresponding priority levels.
 
-  final List<ExpenseData> expenses = []; //expenses list
+  final List<ExpenseData> expenses = [];//expenses list
+
+   List<String> categoryData = <String>[];
+
+  List <String> itemData = <String> [];
+
+ List <Double> amountData = <Double> [];
 
   void _toggleExpenses() {
     setState(() {
@@ -265,8 +273,9 @@ class _AllocationPageState extends State<AllocationPage>
             TextButton(
               onPressed: () {
                 String categoryInput = categoryInputController.text.trim();
-                String priorityInput = priorityLevelController.text.trim(); //ensures that there is no unwanted space in the input
+                String priorityInput = priorityLevelController.text.trim();
 
+                // Check the limit of 9 categories
                 if (categoryPriorityMap.length >= 9) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -276,6 +285,7 @@ class _AllocationPageState extends State<AllocationPage>
                   return;
                 }
 
+                // Check if fields are empty
                 if (categoryInput.isEmpty || priorityInput.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -285,7 +295,8 @@ class _AllocationPageState extends State<AllocationPage>
                   return;
                 }
 
-                int? priorityValue = int.tryParse(priorityInput);          //Parses the string into int
+                // Parse priority input
+                int? priorityValue = int.tryParse(priorityInput);
                 if (priorityValue == null || priorityValue < 1 || priorityValue > 9) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -295,8 +306,12 @@ class _AllocationPageState extends State<AllocationPage>
                   return;
                 }
 
+                // Add category to the list and update the map
                 setState(() {
                   categoryPriorityMap[categoryInput] = priorityValue;
+
+                  // Assuming categoryData is a list of strings
+                  categoryData.add(categoryInput);  // Add category to the list
                 });
 
                 print('Category: $categoryInput');
@@ -309,6 +324,7 @@ class _AllocationPageState extends State<AllocationPage>
       },
     );
   }
+
 
   // Function to display popup when a category is tapped
   void showCategoryDetailsPopup(BuildContext context, String category) {
@@ -617,16 +633,16 @@ class _AllocationPageState extends State<AllocationPage>
                           child: Icon(
                             Icons.add,
                             color: Colors.black,
-                            size: 16,
+                            size: 20,
                           ),
                           style: ElevatedButton.styleFrom(
-                              shape: CircleBorder(),
-                              padding: EdgeInsets.all(10),
-                              minimumSize: Size(30, 30)),
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(10), // Control button size through padding
+                          ),
                         ),
                       ],
                     ),
-                    Text('0/9')
+                    Text('${categoryData.length}/9')
                   ],
                 ),
                 Padding(
@@ -739,24 +755,63 @@ class _AllocationPageState extends State<AllocationPage>
                                         ),
                                       ),
 
+
                                       const SizedBox(width:10),
                                       Expanded(
-                                        child: TextField(
-                                          controller: _categoryController,
-                                          decoration: InputDecoration(
-                                            labelText: 'Category',
-                                            labelStyle: const TextStyle(color: Colors.blueGrey),
-                                            enabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
-                                            ),
-                                            focusedBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black45, width:2.0),
-                                            ),
-                                            contentPadding: EdgeInsets.only(bottom:1.0),
+                                        child: TextButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text('Category'),
+                                                  content: SingleChildScrollView(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: categoryData.isNotEmpty
+                                                          ? categoryData.map((category) {
+                                                        return InkWell(
+                                                          onTap: (){
+                                                            print('Category clicked: $category');
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                            child: Text(
+                                                              category,
+                                                              style: TextStyle(
+                                                                 // Styling to show it's clickable
+                                                                fontSize: 16,
+
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                        );
+                                                      }).toList()
+                                                          : [
+                                                        Text('No categories available.'),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close the dialog
+                                                      },
+                                                      child: Text('Close'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Text(
+                                            'Category',
+                                            style: TextStyle(color: Colors.blueGrey, fontSize: 13),
                                           ),
                                         ),
                                       ),
-
                                       const SizedBox(width:10),
                                       Expanded(
                                         child: TextField(
@@ -799,59 +854,8 @@ class _AllocationPageState extends State<AllocationPage>
                                 ),
                                   ),
                               ),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: expenses.length,
-                                itemBuilder: (context,index){
-                                  final expense = expenses[index];
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal:10),
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                            gradient: kLinearGradient,
-                                            borderRadius: BorderRadius.circular(10)
-                                        ),
-                                      child: ListTile(
-                                      title: Text(expense.item, style: kMontserratWhiteMedium),
-                                      subtitle: Text(expense.category, style: kNormalSansWhiteMini),
-                                      trailing: Row(
-                                        mainAxisSize:MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(right: 8.0),
-                                            child: Text('\$${expense.amount.toStringAsFixed(2)}', style: kNormalSansWhiteMini),
-                                          ),
-                                          PopupMenuButton<String>(
-                                              icon: const Icon(Icons.more_vert, color: Colors.white),
-                                              itemBuilder: (BuildContext context){
-                                                return [
-                                                  const PopupMenuItem<String>(
-                                                    value: 'edit',
-                                                    child: Text('Edit'),
-                                                  ),
-                                                  const PopupMenuItem<String>(
-                                                    value: 'delete',
-                                                    child: Text('Delete'),
-                                                  ),
-                                                ];
-                                              },
-                                              onSelected:(value){
-                                                if (value == 'edit') {
-                                                  _editExpense(index);
-                                                }
-                                                else if (value == 'delete') {
-                                                  _deleteExpense(index);
-                                                }
-                                              }
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                                  );
-                                },
-                              ),
 
-                            ),
+
                             const SizedBox(height:20),
                             ],
                           ),
@@ -872,3 +876,4 @@ class _AllocationPageState extends State<AllocationPage>
     ),);
   }
 }
+

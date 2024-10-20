@@ -40,11 +40,11 @@ class _AllocationPageState extends State<AllocationPage>
 
   final List<ExpenseData> expenses = [];//expenses list
 
-   List<String> categoryData = <String>[];
+  List<String> categoryData = <String>[];
 
   List <String> itemData = <String> [];
 
- List <Double> amountData = <Double> [];
+  List <Double> amountData = <Double> [];
 
   void _toggleExpenses() {
     setState(() {
@@ -75,47 +75,47 @@ class _AllocationPageState extends State<AllocationPage>
         context: context,
         builder: (context){
           return AlertDialog(
-              title: Text('Edit Expense'),
-              content: Column(
+            title: Text('Edit Expense'),
+            content: Column(
               mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _editItemController,
-                    decoration: InputDecoration(labelText: 'Item'),
-                  ),
-                  TextField(
-                    controller: _editCategoryController,
-                    decoration: InputDecoration(labelText: 'Category'),
-                  ),
-                  TextField(
-                    controller: _editAmountController,
-                    decoration: InputDecoration(labelText: 'Amount'),
-                    keyboardType: TextInputType.number,
-                  )
-                ],
-              ),
+              children: [
+                TextField(
+                  controller: _editItemController,
+                  decoration: InputDecoration(labelText: 'Item'),
+                ),
+                TextField(
+                  controller: _editCategoryController,
+                  decoration: InputDecoration(labelText: 'Category'),
+                ),
+                TextField(
+                  controller: _editAmountController,
+                  decoration: InputDecoration(labelText: 'Amount'),
+                  keyboardType: TextInputType.number,
+                )
+              ],
+            ),
             actions: [
               TextButton(onPressed: (){
                 setState(() {
                   expenses[index] =ExpenseData(
-                      item: _editItemController.text,
-                      category: _editCategoryController.text,
-                      amount: double.parse(_editAmountController.text),
+                    item: _editItemController.text,
+                    category: _editCategoryController.text,
+                    amount: double.parse(_editAmountController.text),
                   );
                 }
-              );
+                );
                 Navigator.of(context).pop();
                 _clearControllers();
-            },
+              },
                 child: Text('Save'),
               ),
               TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-          )
-          ],
-        );
-      }
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Cancel'),
+              )
+            ],
+          );
+        }
     );
   }
 
@@ -356,12 +356,12 @@ class _AllocationPageState extends State<AllocationPage>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Priority Level: ',
-                            style: kNormalSansWhiteMini
+                              'Priority Level: ',
+                              style: kNormalSansWhiteMini
                           ),
                           Text(
-                            '${categoryPriorityMap[category] ?? 'N/A'}',
-                            style: kNormalSansWhiteMini
+                              '${categoryPriorityMap[category] ?? 'N/A'}',
+                              style: kNormalSansWhiteMini
                           ),
                         ],
                       ),
@@ -435,445 +435,445 @@ class _AllocationPageState extends State<AllocationPage>
         body: ListView(
           children: [
             SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    SingleChildScrollView(
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => TrackerPage()),
-                                );
-                              },
-                              child: Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Color(0xffb1d4e0),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Personal',
-                                    style: TextStyle(color: Colors.black),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => TrackerPage()),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffb1d4e0),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Personal',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => TrackerPage()),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: kGradientColors,
+                                    child: Center(
+                                      child: Text(
+                                        'Budget Allocator',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(vertical: 20),
+                            padding: EdgeInsets.all(15),
+                            decoration: kGradientColors,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '₽ 0.00',
+                                          style: kMontserratWhiteLarge,
+                                        ),
+                                        Opacity(
+                                          opacity: 0.5,
+                                          child: Text('Total Saved',
+                                              style: kMontserratGraySmall),
+                                        ),
+                                      ],
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        showPromptPopup(context);
+                                      },
+                                      child: Icon(
+                                        Icons.edit_note_rounded,
+                                        color: Colors.black,
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        shape: CircleBorder(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                LinearProgressIndicator(
+                                  value: controller.value,
+                                  semanticsLabel: 'Linear Progress Indicator',
+                                  backgroundColor: Colors.blue[900],
+                                  valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                                SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Budget',
+                                          style: kNormalSansWhiteMini,
+                                        ),
+                                        Text(
+                                          '₽0.00',
+                                          style: kNormalSansWhiteSmall,
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Target Goal',
+                                          style: kNormalSansWhiteMini,
+                                        ),
+                                        Text(
+                                          '₽0.00',
+                                          style: kNormalSansWhiteSmall,
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Days Remaining',
+                                          style: kNormalSansWhiteMini,
+                                        ),
+                                        Text(
+                                          '0 days',
+                                          style: kNormalSansWhiteSmall,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => TrackerPage()),
-                                );
-                              },
-                              child: Container(
-                                height: 50,
-                                decoration: kGradientColors,
-                                child: Center(
-                                  child: Text(
-                                    'Budget Allocator',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                          Container(
+                            margin: EdgeInsets.only(bottom: 20),
+                            width: double.infinity,
+                            padding: EdgeInsets.all(15),
+                            decoration: kGradientColors,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Today's Budget",
+                                        style: kMontserratWhiteMedium),
+                                    Text(
+                                      '\$ 0',
+                                      style: kMontserratWhiteMedium,
+                                    )
+                                  ],
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.symmetric(vertical: 20),
-                        padding: EdgeInsets.all(15),
-                        decoration: kGradientColors,
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '₽ 0.00',
-                                      style: kMontserratWhiteLarge,
-                                    ),
-                                    Opacity(
-                                      opacity: 0.5,
-                                      child: Text('Total Saved',
-                                          style: kMontserratGraySmall),
-                                    ),
-                                  ],
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showPromptPopup(context);
-                                  },
-                                  child: Icon(
-                                    Icons.edit_note_rounded,
-                                    color: Colors.black,
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    shape: CircleBorder(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            LinearProgressIndicator(
-                              value: controller.value,
-                              semanticsLabel: 'Linear Progress Indicator',
-                              backgroundColor: Colors.blue[900],
-                              valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                            SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Budget',
-                                      style: kNormalSansWhiteMini,
-                                    ),
-                                    Text(
-                                      '₽0.00',
-                                      style: kNormalSansWhiteSmall,
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Target Goal',
-                                      style: kNormalSansWhiteMini,
-                                    ),
-                                    Text(
-                                      '₽0.00',
-                                      style: kNormalSansWhiteSmall,
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Days Remaining',
-                                      style: kNormalSansWhiteMini,
-                                    ),
-                                    Text(
-                                      '0 days',
-                                      style: kNormalSansWhiteSmall,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        width: double.infinity,
-                        padding: EdgeInsets.all(15),
-                        decoration: kGradientColors,
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Today's Budget",
-                                    style: kMontserratWhiteMedium),
-                                Text(
-                                  '\$ 0',
-                                  style: kMontserratWhiteMedium,
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                    ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Categories',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        Row(
+                          children: [
+                            Text(
+                              'Categories',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                            ),
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                showAnotherPromptPopup(context);
+                              },
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 20,
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: CircleBorder(),
+                                padding: EdgeInsets.all(10), // Control button size through padding
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            showAnotherPromptPopup(context);
-                          },
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 20,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            shape: CircleBorder(),
-                            padding: EdgeInsets.all(10), // Control button size through padding
-                          ),
-                        ),
+                        Text('${categoryData.length}/9')
                       ],
                     ),
-                    Text('${categoryData.length}/9')
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: categoryPriorityMap.keys
-                            .map(
-                              (category) => GestureDetector(
-                            onTap: () {
-                              showCategoryDetailsPopup(context, category);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(187, 233, 255, 1.0), // Corrected opacity
-                                borderRadius: BorderRadius.circular(25),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 1,
-                                    blurRadius: 3,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                category,
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                          ),
-                        )
-                            .toList(),
-                      ),
-                    ],
-                  ),
-                ),
-
-                GestureDetector(
-                    onTap: () {
-                      FocusScope.of(context).unfocus();
-                    },
-                    child: Column(
-                  children: [
-                    Container(
-                      width: _isExpanded ? double.infinity : 500,
-                      height: _isExpanded ? 400 : 75, //adjust height here if needed
-                      child: Container( // Toggles expenses expanding
-                        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 7),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Expenses', style: kMontserratBlackMedium),
-                                IconButton(
-                                  onPressed: () {
-                                    _toggleExpenses();
-                                  },
-                                  icon: Icon(
-                                    _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (_isExpanded)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    FocusScope.of(context).unfocus();
-                                  },
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: categoryPriorityMap.keys
+                                .map(
+                                  (category) => GestureDetector(
+                                onTap: () {
+                                  showCategoryDetailsPopup(context, category);
+                                },
                                 child: Container(
-                                  width: 400, decoration: BoxDecoration(
-                                  color: const Color(0xffb1d4e0),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const SizedBox(width:10),
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _itemController,
-                                          decoration: InputDecoration(
-                                            labelText: 'Item',
-                                            labelStyle: TextStyle(color: Colors.blueGrey),
-                                            enabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
-                                            ),
-                                            focusedBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black45, width:2.0),
-                                            ),
-                                            contentPadding: EdgeInsets.only(bottom:1.0),
-                                          ),
-                                        ),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 15),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromRGBO(187, 233, 255, 1.0), // Corrected opacity
+                                    borderRadius: BorderRadius.circular(25),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 1,
+                                        blurRadius: 3,
+                                        offset: Offset(0, 3),
                                       ),
-
-
-                                      const SizedBox(width:10),
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: Text('Category'),
-                                                  content: SingleChildScrollView(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: categoryData.isNotEmpty
-                                                          ? categoryData.map((category) {
-                                                        return InkWell(
-                                                          onTap: (){
-                                                            print('Category clicked: $category');
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                            child: Text(
-                                                              category,
-                                                              style: TextStyle(
-                                                                 // Styling to show it's clickable
-                                                                fontSize: 16,
-
-                                                              ),
-                                                            ),
-                                                          ),
-
-                                                        );
-                                                      }).toList()
-                                                          : [
-                                                        Text('No categories available.'),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop(); // Close the dialog
-                                                      },
-                                                      child: Text('Close'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: Text(
-                                            'Category',
-                                            style: TextStyle(color: Colors.blueGrey, fontSize: 13),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width:10),
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _amountController,
-                                          decoration: InputDecoration(
-                                            labelText: 'Amount',
-                                            labelStyle: TextStyle(color: Colors.blueGrey),
-                                            enabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
-                                            ),
-                                            focusedBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black45, width:2.0),
-                                            ),
-                                            contentPadding: EdgeInsets.only(bottom:1.0),
-                                          ),
-                                          keyboardType: TextInputType.number,
-                                        ),
-                                      ),
-
-                                      const SizedBox(width:1),
-                                      Container(
-                                        width:30,
-                                        child: ElevatedButton(
-                                          onPressed: _isEditingExpense ? () {} : _addExpense,
-                                          style: ElevatedButton.styleFrom(
-                                            shape: CircleBorder(),
-                                            padding: EdgeInsets.all(0),
-                                          ),
-                                          child: const Icon(
-                                            Icons.add,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-
-                                      const SizedBox(width:10),
-
                                     ],
                                   ),
-                                ),
+                                  child: Text(
+                                    category,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
+                                ),
+                              ),
+                            )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    GestureDetector(
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: _isExpanded ? double.infinity : 500,
+                              height: _isExpanded ? 400 : 75, //adjust height here if needed
+                              child: Container( // Toggles expenses expanding
+                                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 7),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('Expenses', style: kMontserratBlackMedium),
+                                        IconButton(
+                                          onPressed: () {
+                                            _toggleExpenses();
+                                          },
+                                          icon: Icon(
+                                            _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (_isExpanded)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            FocusScope.of(context).unfocus();
+                                          },
+                                          child: Container(
+                                            width: 400, decoration: BoxDecoration(
+                                            color: const Color(0xffb1d4e0),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                const SizedBox(width:10),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: _itemController,
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Item',
+                                                      labelStyle: TextStyle(color: Colors.blueGrey),
+                                                      enabledBorder: UnderlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                                      ),
+                                                      focusedBorder: const UnderlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                                      ),
+                                                      contentPadding: EdgeInsets.only(bottom:1.0),
+                                                    ),
+                                                  ),
+                                                ),
+
+
+                                                const SizedBox(width:10),
+                                                Expanded(
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext context) {
+                                                          return AlertDialog(
+                                                            title: Text('Category'),
+                                                            content: SingleChildScrollView(
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: categoryData.isNotEmpty
+                                                                    ? categoryData.map((category) {
+                                                                  return InkWell(
+                                                                    onTap: (){
+                                                                      print('Category clicked: $category');
+                                                                      Navigator.of(context).pop();
+                                                                    },
+                                                                    child: Padding(
+                                                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                                      child: Text(
+                                                                        category,
+                                                                        style: TextStyle(
+                                                                          // Styling to show it's clickable
+                                                                          fontSize: 16,
+
+                                                                        ),
+                                                                      ),
+                                                                    ),
+
+                                                                  );
+                                                                }).toList()
+                                                                    : [
+                                                                  Text('No categories available.'),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(context).pop(); // Close the dialog
+                                                                },
+                                                                child: Text('Close'),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'Category',
+                                                      style: TextStyle(color: Colors.blueGrey, fontSize: 13),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width:10),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: _amountController,
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Amount',
+                                                      labelStyle: TextStyle(color: Colors.blueGrey),
+                                                      enabledBorder: UnderlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                                      ),
+                                                      focusedBorder: const UnderlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                                      ),
+                                                      contentPadding: EdgeInsets.only(bottom:1.0),
+                                                    ),
+                                                    keyboardType: TextInputType.number,
+                                                  ),
+                                                ),
+
+                                                const SizedBox(width:1),
+                                                Container(
+                                                  width:30,
+                                                  child: ElevatedButton(
+                                                    onPressed: _isEditingExpense ? () {} : _addExpense,
+                                                    style: ElevatedButton.styleFrom(
+                                                      shape: CircleBorder(),
+                                                      padding: EdgeInsets.all(0),
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.add,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                const SizedBox(width:10),
+
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+
+                                    const SizedBox(height:20),
+                                  ],
+                                ),
                               ),
 
+                            ),
 
-                            const SizedBox(height:20),
-                            ],
-                          ),
-                        ),
+                            const SizedBox(height:40),
 
-                      ),
-
-                    const SizedBox(height:40),
-
+                          ],
+                        )
+                    ),
                   ],
                 )
-                ),
-              ],
-            )
-          ),
-        ],
-      ),
-    ),);
+            ),
+          ],
+        ),
+      ),);
   }
 }
 

@@ -22,6 +22,8 @@ class _TrackerPageState extends State<TrackerPage>
   late String userID;
   late String expenseID;
 
+  late CoinCalculator coinCalculator;
+
   double todaysBudget = 0;
   double todaysGoal = 0;
 
@@ -37,8 +39,8 @@ class _TrackerPageState extends State<TrackerPage>
         vsync: this,
         duration: const Duration(seconds: 5),
       )..addListener(() {
-          setState(() {});
-        });
+        setState(() {});
+      });
       // controller.repeat(reverse: false);
     }
   }
@@ -80,10 +82,16 @@ class _TrackerPageState extends State<TrackerPage>
           builder: (context, snapshot) {
             // Default values
             double goal = 0;
-            int days = 0;
+            int totalDays = 0;
+            int daysRemaining = 0;
+            int latestDay = 0;
+
             double budget = 0;
+            DateTime? startDate;
             double totalExpenses = 0;
             double totalSaved = 0;
+            double displayedBudget = 0;
+
 
             // check connection state
 
@@ -104,18 +112,37 @@ class _TrackerPageState extends State<TrackerPage>
               // Use data if available
               if (data != null) {
                 goal = (data['goal'] ?? 0).toDouble();
-                days = (data['days'] ?? 0).toInt();
+                totalDays = (data['days'] ?? 0).toInt();
                 budget = (data['budget'] ?? 0).toDouble();
 
-                final CoinCalculator calculator = CoinCalculator(
-                    availableBudget: budget, targetGoal: goal, days: days);
+                // fetch the start date
+                Timestamp? startTimestamp = data['startDate'] as Timestamp?;
+                if (startTimestamp != null) {
+                  startDate = startTimestamp.toDate();
+                }
 
-                List<double> dailyBudgets = calculator.calculateDailyBudgets();
-                todaysBudget = dailyBudgets.isNotEmpty ? dailyBudgets[0] : 0;
+                if (startDate != null) {
+                  DateTime currentDate = DateTime.now();
+                  int daysElapsed = currentDate.difference(startDate).inDays;
+                  daysRemaining = (totalDays - daysElapsed).clamp(0, totalDays);
+                  latestDay = totalDays - daysRemaining;
 
-                List<double> dailyGoals = calculator.calculateDailyGoal();
-                todaysGoal = dailyGoals.isNotEmpty ? dailyGoals[0] : 0;
+                  final CoinCalculator calculator = CoinCalculator(
+                      availableBudget: budget,
+                      targetGoal: goal,
+                      days: daysRemaining);
 
+                  List<double> dailyBudgets = calculator.calculateDailyBudgets();
+                  List<double> dailyGoals = calculator.calculateDailyGoal();
+
+                  int currentDayIndex = daysElapsed.clamp(0, dailyBudgets.length);
+
+                  todaysBudget = dailyBudgets.isNotEmpty ? dailyBudgets[currentDayIndex] : 0;
+                  displayedBudget = todaysBudget < 0 ? 0 : todaysBudget;
+
+                  todaysGoal = dailyGoals.isNotEmpty ? dailyGoals[currentDayIndex] : 0;
+
+                }
               }
             }
 
@@ -124,8 +151,6 @@ class _TrackerPageState extends State<TrackerPage>
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: fireStore.fetchExpensesData(userID),
                 builder: (context, snapshot) {
-                  var expenses = snapshot.data!.docs;
-
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   }
@@ -138,14 +163,15 @@ class _TrackerPageState extends State<TrackerPage>
                     print('No expenses data found.');
                   }
 
+                  var expenses = snapshot.data!.docs;
+
                   // Calculate total expenses
                   totalExpenses = 0.0; // Initialize total expenses
                   for (var expense in expenses) {
                     var expenseData = expense.data();
-                    double price = expenseData['price'] ?? 0.0; // Get price
+                    double price = expenseData['price'] ?? 0.00; // Get price
                     totalExpenses += price; // Add to total
                   }
-
 
                   return Column(
                     children: [
@@ -206,15 +232,14 @@ class _TrackerPageState extends State<TrackerPage>
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Column(
+                                      Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '₽ 0.00',
-                                            // ₱
+                                            '₱ 0.00',
                                             style: kMontserratWhiteLarge,
                                           ),
                                           Opacity(
@@ -249,46 +274,46 @@ class _TrackerPageState extends State<TrackerPage>
                                   SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Budget',
                                             style: kNormalSansWhiteMini,
                                           ),
                                           Text(
-                                            '₽${budget.toStringAsFixed(2)}',
+                                            '₱${budget.toStringAsFixed(2)}',
                                             style: kNormalSansWhiteSmall,
                                           ),
                                         ],
                                       ),
                                       Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Target Goal',
                                             style: kNormalSansWhiteMini,
                                           ),
                                           Text(
-                                            '₽${goal.toStringAsFixed(2)}',
+                                            '₱${goal.toStringAsFixed(2)}',
                                             style: kNormalSansWhiteSmall,
                                           ),
                                         ],
                                       ),
                                       Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Days Remaining',
                                             style: kNormalSansWhiteMini,
                                           ),
                                           Text(
-                                            '${days} days',
+                                            '${daysRemaining} days',
                                             style: kNormalSansWhiteSmall,
                                           ),
                                         ],
@@ -307,24 +332,24 @@ class _TrackerPageState extends State<TrackerPage>
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Today's Target",
                                           style: kMontserratWhiteMedium),
                                       Text(
-                                        '\$ ${todaysGoal.toStringAsFixed(2)}',
+                                        '₱ ${todaysGoal.toStringAsFixed(2)}',
                                         style: kMontserratWhiteMedium,
                                       )
                                     ],
                                   ),
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Today's Budget",
                                           style: kMontserratWhiteMedium),
                                       Text(
-                                        '\$ ${todaysBudget.toStringAsFixed(2)}',
+                                        '₱ ${displayedBudget.toStringAsFixed(2)}',
                                         style: kMontserratWhiteMedium,
                                       )
                                     ],
@@ -342,7 +367,10 @@ class _TrackerPageState extends State<TrackerPage>
                                     ElevatedButton(
                                       onPressed: () {
                                         kAddingBottomSheet(
-                                            context: context, userId: userID);
+                                            context: context,
+                                            userId: userID,
+                                            currentDay: latestDay,
+                                            calculator: CoinCalculator(availableBudget: budget, targetGoal: goal, days: daysRemaining));
                                       },
                                       child: Icon(
                                         Icons.add,
@@ -356,7 +384,8 @@ class _TrackerPageState extends State<TrackerPage>
                                         showDialog(
                                             context: context,
                                             builder: (BuildContext) {
-                                              return expenseOutput(totalExpenses);
+                                              return expenseOutput(
+                                                  totalExpenses);
                                             });
                                       },
                                       child: Icon(
@@ -400,10 +429,10 @@ class _TrackerPageState extends State<TrackerPage>
 
                             return Padding(
                               padding:
-                                  const EdgeInsets.symmetric(vertical: 5.0),
+                              const EdgeInsets.symmetric(vertical: 5.0),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Expanded(
@@ -411,7 +440,7 @@ class _TrackerPageState extends State<TrackerPage>
                                         style: kNormalMontserratBlackMedium),
                                   ),
                                   Expanded(
-                                    child: Text('\$${price.toStringAsFixed(2)}',
+                                    child: Text('₱${price.toStringAsFixed(2)}',
                                         style: kNormalMontserratBlackMedium),
                                   ),
                                   ElevatedButton(
@@ -426,7 +455,7 @@ class _TrackerPageState extends State<TrackerPage>
                                         currentProduct: product,
                                         // Pass the current product name
                                         currentPrice:
-                                            price, // Pass the current price
+                                        price, // Pass the current price
                                       );
                                     },
                                     child: Icon(
@@ -440,6 +469,10 @@ class _TrackerPageState extends State<TrackerPage>
                                     onPressed: () async {
                                       await fireStore.deleteExpensesData(
                                           userID: userID, expenseID: expenseID);
+                                      coinCalculator.deleteExpense(expenseID);
+                                      setState(() {
+
+                                      });
                                     },
                                     child: Icon(
                                       Icons.delete,
@@ -466,7 +499,14 @@ class _TrackerPageState extends State<TrackerPage>
   }
 }
 
-//TODO: create a function that sums all data and store into amount spent parameter
+// Tracker page
+//TODO: incorporate addExpense and deleteExpense method form coin calculator.
+//TODO: everyday a day ends, it will keep track of the added expense
+//TODO: create conditional dialogs
+
+
+// Other pages
 //TODO: leaderboard implementation
 //TODO: knapsack algorithm
 //TODO: allocator implementation
+

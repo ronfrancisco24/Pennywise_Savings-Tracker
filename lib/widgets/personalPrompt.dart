@@ -74,14 +74,22 @@ void showPromptPopup(BuildContext context) {
               double? goal = double.tryParse(targetGoal);
               int? days = int.tryParse(daysRemaining);
               double? budgetValue = double.tryParse(budget);
+              double totalSaved = 0;
 
               if (goal != null && days != null && budgetValue != null) {
-                fireStore.addSavingsData(
-                  userId: userID.toString(),
-                  goal: goal,
-                  days: days,
-                  budget: budgetValue,
-                );
+
+                // make sure that savings goal is lower than budget.
+
+                if (budgetValue > goal) {
+                  fireStore.addSavingsData(
+                    userId: userID.toString(),
+                    goal: goal,
+                    days: days,
+                    budget: budgetValue, totalAmountSaved: totalSaved,
+                  );
+                } else {
+                  print('The target goal cannot be higher than the budget.');
+                }
 
               } else {
                 print(

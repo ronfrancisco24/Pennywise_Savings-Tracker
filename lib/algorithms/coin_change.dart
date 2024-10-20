@@ -26,7 +26,7 @@ class CoinCalculator {
   List<double> calculateDailyGoal() {
     double dailyGoal = targetGoal / days;
     // Fill list with daily goal for each day
-    for (int i = 0; i < days; i++){
+    for (int i = 0; i < days; i++) {
       dailySavings.add(dailyGoal);
     }
     return dailySavings;
@@ -35,29 +35,26 @@ class CoinCalculator {
   // Initialize daily budgets for each day
   List<double> calculateDailyBudgets() {
     double dailyBudget = (availableBudget - targetGoal) / days;
-     // Fill list with daily budget for each day
-    for (int i = 0; i < days; i++){
+    // Fill list with daily budget for each day
+    for (int i = 0; i < days; i++) {
       dailyBudgets.add(dailyBudget);
     }
     return dailyBudgets;
   }
 
   void adjustBudgetsAndGoals() {
-
-    int currentDay = expenses.length - 1; // Get the current day index based on expenses
-    int remainingDays = days - (currentDay + 1); // Calculate the remaining days after today
-    if (expenses[currentDay].price == 0) return; // No expenses to adjust against
+    int currentDay =
+        expenses.length - 1; // Get the current day index based on expenses
+    int remainingDays =
+        days - (currentDay + 1); // Calculate the remaining days after today
+    if (expenses[currentDay].price == 0)
+      return; // No expenses to adjust against
 
     double currentSpending = expenses[currentDay].price;
 
     // keep track of expense on last day, whether if target is reachable based on expense
-    if (currentDay == days - 1){
-        double lastExtra = currentSpending - dailyBudgets[currentDay];
-        double adjustment = lastExtra / (remainingDays + 1);
-
-        // Adjust the last day's budget and savings goal
-        dailyBudgets[currentDay] -= adjustment; // Decrease budget for last day
-        dailySavings[currentDay] += adjustment; // Increase savings goal for last day
+    if (currentDay == days - 1) {
+      adjustForLastDay();
     } else if (remainingDays > 0) {
       double extra = expenses[currentDay].price - dailyBudgets[currentDay];
       double adjustment = extra / remainingDays;
@@ -65,25 +62,49 @@ class CoinCalculator {
       // Adjust the subsequent days' budgets and goals
       for (int i = currentDay + 1; i < days; i++) {
         dailyBudgets[i] -= adjustment; // Decrease budget for subsequent days
-        dailySavings[i] += adjustment; // Increase savings goal for subsequent days
-        decisionTree.evaluate(currentSpending, dailyBudgets[i], dailySavings[i]); // evaluates spendings.
+        dailySavings[i] +=
+            adjustment; // Increase savings goal for subsequent days
+        decisionTree.evaluate(currentSpending, dailyBudgets[i],
+            dailySavings[i]); // evaluates spendings.
       }
+    }
+  }
+
+  void adjustForLastDay() {
+    int lastDay = days - 1; // Get the last day index
+    double lastExtra = 0;
+
+    // Check if the last day's spending exceeds the budget
+    if (expenses.length > lastDay && dailyBudgets[lastDay] < expenses[lastDay].price) {
+      lastExtra = expenses[lastDay].price - dailyBudgets[lastDay]; // Calculate the extra spending
+
+      // Adjust the last day's budget and savings goal
+      dailyBudgets[lastDay] -= lastExtra; // Decrease the budget for the last day
+      dailySavings[lastDay] += lastExtra; // Increase the savings goal for the last day
     }
   }
 
   // Method to add an expense
   void addExpense(String id, String name, double amount, int day) {
-    if (day >= 0 && day < days){
+    if (day >= 0 && day < days) {
       expenses.add(Expense(id: id, product: name, price: amount));
       adjustBudgetsAndGoals(); // Adjust values after adding expense
     } else {
       print('invalid index.');
     }
-
   }
 
-  void calculateSavings(){
-    totalSaved = dailySavings.reduce((a, b) => a + b); // adds daily savings to total saved.
+  // will adjust if an expense has been deleted.
+  void deleteExpense(String expenseId) {
+    expenses.removeWhere((expense) =>
+        expense.id == expenseId); // Assume Expense has an id property
+    adjustBudgetsAndGoals();
+    // Optionally recalculate your budget and goals here
+  }
+
+  void calculateSavings() {
+    totalSaved = dailySavings
+        .reduce((a, b) => a + b); // adds daily savings to total saved.
   }
 
   // Calculate the total amount spent so far
@@ -107,7 +128,6 @@ class CoinCalculator {
 
     print('Savings Progress: |$bar| $progressPercentage%');
   }
-
 }
 
 void main() {

@@ -7,6 +7,8 @@ import 'package:savings_2/algorithms/coin_change.dart';
 Future<void> kAddingBottomSheet({
   required BuildContext context,
   required String userId, // Ensure you pass userId
+  required CoinCalculator calculator,
+  required int currentDay
 }) {
   final TextEditingController _productController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -51,6 +53,9 @@ Future<void> kAddingBottomSheet({
                           product: product,
                           price: parsedPrice,
                         );
+
+                        // update calculator with new expense
+                        calculator.addExpense(userId, product, parsedPrice, currentDay);
 
                         // Optionally close the bottom sheet
                         Navigator.of(context).pop();

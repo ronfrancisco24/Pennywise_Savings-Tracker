@@ -4,20 +4,20 @@ import 'home_page.dart';
 import '../widgets/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:savings_2/authentication/auth_service.dart';
+import 'package:savings_2/screens/invitationpage.dart';
 
 
 class ProfilePage extends StatefulWidget {
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
-
-
 }
 
 class _ProfilePageState extends State<ProfilePage> {
 
   String username = '';
   String email = '';
+  late String inviteCode;
 
   final AuthService authService = AuthService();
 
@@ -150,7 +150,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 builder: (context) => PersonalInfoPage(),
                               ),
                             );
-                            // Need pa ng pages
                           },
                           child: Row(
                             children: [
@@ -178,7 +177,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            //Need pa ng pages
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EnterInviteCodePage(), // Navigate to the invitation input page
+                              ),
+                            );
                           },
                           child: Row(
                             children: [

@@ -35,11 +35,17 @@ const kMontserratBlackMedium = TextStyle(
     color: Colors.black,
     fontWeight: FontWeight.bold);
 
+const kMontserratBlackSmall = TextStyle(
+    fontFamily: 'Montserrat',
+    fontSize: 15,
+    color: Colors.black,
+    fontWeight: FontWeight.bold);
+
 const kMontserratWhiteMedium = TextStyle(
     fontFamily: 'Montserrat',
     fontSize: 20,
-    color: Colors.white,
-    fontWeight: FontWeight.bold);
+    color: Colors.white);
+
 const kMontserratWhiteLarge = TextStyle(
     fontFamily: 'Montserrat',
     fontSize: 30,

@@ -208,12 +208,13 @@ class _TrackerPageState extends State<TrackerPage>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Column(
+                                      const Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             '₽ 0.00',
+                                            // ₱
                                             style: kMontserratWhiteLarge,
                                           ),
                                           Opacity(

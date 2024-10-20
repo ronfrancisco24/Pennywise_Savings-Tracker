@@ -7,18 +7,18 @@ import 'tracker.dart';
 import 'package:savings_2/authentication/auth_service.dart';
 
 class AllocationPage extends StatefulWidget {
-
   final AuthService authService = AuthService();
 
   @override
   State<AllocationPage> createState() => _AllocationPageState();
 }
 
-class ExpenseData{
+class ExpenseData {
   late String item;
   late String category;
   late double amount;
-  ExpenseData({required this.item, required this.category, required this.amount});
+  ExpenseData(
+      {required this.item, required this.category, required this.amount});
 }
 
 class _AllocationPageState extends State<AllocationPage>
@@ -36,15 +36,13 @@ class _AllocationPageState extends State<AllocationPage>
 
   late AnimationController controller; //declared variables
 
-  Map<String, int> categoryPriorityMap = {}; //Map is used to associated categories with their corresponding priority levels.
+  Map<String, int> categoryPriorityMap =
+      {}; //Map is used to associated categories with their corresponding priority levels.
 
-  final List<ExpenseData> expenses = [];//expenses list
+  final List<ExpenseData> expenses = []; //expenses list
 
   List<String> categoryData = <String>[];
-
-  List <String> itemData = <String> [];
-
-  List <Double> amountData = <Double> [];
+  String? _selectedCategory;
 
   void _toggleExpenses() {
     setState(() {
@@ -52,28 +50,36 @@ class _AllocationPageState extends State<AllocationPage>
     });
   }
 
-  void _addExpense(){
+  void _addExpense() {
     final String item = _itemController.text;
-    final String category = _categoryController.text;
-    final double? amount = double.tryParse(_amountController.text); //text controllers
 
-    if (item.isNotEmpty && category.isNotEmpty && amount != null){
-      setState((){
-        expenses.add(ExpenseData(item: item, category: category, amount: amount));
+    final double? amount =
+        double.tryParse(_amountController.text); //text controllers
+
+    if (item.isNotEmpty && _selectedCategory != null && amount != null) {
+      setState(() {
+        expenses
+            .add(ExpenseData(item: item, category: _selectedCategory!, amount: amount));
       });
 
-      _clearControllers(); //clear input after adding them
+
+      _itemController.clear();
+      _amountController.clear();
+      _selectedCategory = null;
+      print('item added $item, Amount added: $amount, Category: $_selectedCategory');
+    } else{
+      print('please enter item, amount, and select a category.');
     }
   }
 
-  void _editExpense(int index){
+  void _editExpense(int index) {
     _editItemController.text = expenses[index].item;
     _editCategoryController.text = expenses[index].category;
     _editAmountController.text = expenses[index].amount.toString();
 
     showDialog(
         context: context,
-        builder: (context){
+        builder: (context) {
           return AlertDialog(
             title: Text('Edit Expense'),
             content: Column(
@@ -95,18 +101,18 @@ class _AllocationPageState extends State<AllocationPage>
               ],
             ),
             actions: [
-              TextButton(onPressed: (){
-                setState(() {
-                  expenses[index] =ExpenseData(
-                    item: _editItemController.text,
-                    category: _editCategoryController.text,
-                    amount: double.parse(_editAmountController.text),
-                  );
-                }
-                );
-                Navigator.of(context).pop();
-                _clearControllers();
-              },
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    expenses[index] = ExpenseData(
+                      item: _editItemController.text,
+                      category: _editCategoryController.text,
+                      amount: double.parse(_editAmountController.text),
+                    );
+                  });
+                  Navigator.of(context).pop();
+                  _clearControllers();
+                },
                 child: Text('Save'),
               ),
               TextButton(
@@ -115,8 +121,7 @@ class _AllocationPageState extends State<AllocationPage>
               )
             ],
           );
-        }
-    );
+        });
   }
 
   void _deleteExpense(int index) {
@@ -125,7 +130,7 @@ class _AllocationPageState extends State<AllocationPage>
     });
   }
 
-  void _clearControllers(){
+  void _clearControllers() {
     _itemController.clear();
     _categoryController.clear();
     _amountController.clear();
@@ -135,13 +140,13 @@ class _AllocationPageState extends State<AllocationPage>
   void initState() {
     super.initState();
     final user = authService.getCurrentUser();
-    if (user != null){
+    if (user != null) {
       controller = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
       )..addListener(() {
-        setState(() {});
-      });
+          setState(() {});
+        });
     }
   }
 
@@ -297,10 +302,13 @@ class _AllocationPageState extends State<AllocationPage>
 
                 // Parse priority input
                 int? priorityValue = int.tryParse(priorityInput);
-                if (priorityValue == null || priorityValue < 1 || priorityValue > 9) {
+                if (priorityValue == null ||
+                    priorityValue < 1 ||
+                    priorityValue > 9) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Please enter a valid priority between 1 and 9.'),
+                      content: Text(
+                          'Please enter a valid priority between 1 and 9.'),
                     ),
                   );
                   return;
@@ -311,7 +319,7 @@ class _AllocationPageState extends State<AllocationPage>
                   categoryPriorityMap[categoryInput] = priorityValue;
 
                   // Assuming categoryData is a list of strings
-                  categoryData.add(categoryInput);  // Add category to the list
+                  categoryData.add(categoryInput); // Add category to the list
                 });
 
                 print('Category: $categoryInput');
@@ -324,7 +332,6 @@ class _AllocationPageState extends State<AllocationPage>
       },
     );
   }
-
 
   // Function to display popup when a category is tapped
   void showCategoryDetailsPopup(BuildContext context, String category) {
@@ -340,7 +347,8 @@ class _AllocationPageState extends State<AllocationPage>
           title: SingleChildScrollView(
             child: Container(
               decoration: kGradientColors,
-              padding: EdgeInsets.symmetric(horizontal: 16.0), // Set horizontal padding
+              padding: EdgeInsets.symmetric(
+                  horizontal: 16.0), // Set horizontal padding
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
@@ -349,39 +357,30 @@ class _AllocationPageState extends State<AllocationPage>
                     children: [
                       Text(
                         '$category',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       SizedBox(height: 20), // Add space between elements
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                              'Priority Level: ',
-                              style: kNormalSansWhiteMini
-                          ),
-                          Text(
-                              '${categoryPriorityMap[category] ?? 'N/A'}',
-                              style: kNormalSansWhiteMini
-                          ),
+                          Text('Priority Level: ', style: kNormalSansWhiteMini),
+                          Text('${categoryPriorityMap[category] ?? 'N/A'}',
+                              style: kNormalSansWhiteMini),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                              'Subgoal Target: ',
-                              style: kNormalSansWhiteMini
-                          ),
+                          Text('Subgoal Target: ', style: kNormalSansWhiteMini),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text(
-                                'Recommended Savings: ',
-                                style: kNormalSansWhiteMini
-                            ),
+                            child: Text('Recommended Savings: ',
+                                style: kNormalSansWhiteMini),
                           ),
                         ],
                       ),
@@ -402,7 +401,6 @@ class _AllocationPageState extends State<AllocationPage>
             ),
           ),
         );
-
       },
     );
   }
@@ -500,11 +498,11 @@ class _AllocationPageState extends State<AllocationPage>
                               children: [
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '₽ 0.00',
@@ -536,17 +534,17 @@ class _AllocationPageState extends State<AllocationPage>
                                   value: controller.value,
                                   semanticsLabel: 'Linear Progress Indicator',
                                   backgroundColor: Colors.blue[900],
-                                  valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 ),
                                 SizedBox(height: 20),
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Budget',
@@ -560,7 +558,7 @@ class _AllocationPageState extends State<AllocationPage>
                                     ),
                                     Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Target Goal',
@@ -574,7 +572,7 @@ class _AllocationPageState extends State<AllocationPage>
                                     ),
                                     Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Days Remaining',
@@ -600,7 +598,7 @@ class _AllocationPageState extends State<AllocationPage>
                               children: [
                                 Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text("Today's Budget",
                                         style: kMontserratWhiteMedium),
@@ -623,7 +621,8 @@ class _AllocationPageState extends State<AllocationPage>
                           children: [
                             Text(
                               'Categories',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
                             ),
                             SizedBox(width: 10),
                             ElevatedButton(
@@ -637,7 +636,8 @@ class _AllocationPageState extends State<AllocationPage>
                               ),
                               style: ElevatedButton.styleFrom(
                                 shape: CircleBorder(),
-                                padding: EdgeInsets.all(10), // Control button size through padding
+                                padding: EdgeInsets.all(
+                                    10), // Control button size through padding
                               ),
                             ),
                           ],
@@ -656,39 +656,40 @@ class _AllocationPageState extends State<AllocationPage>
                             children: categoryPriorityMap.keys
                                 .map(
                                   (category) => GestureDetector(
-                                onTap: () {
-                                  showCategoryDetailsPopup(context, category);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 15),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromRGBO(187, 233, 255, 1.0), // Corrected opacity
-                                    borderRadius: BorderRadius.circular(25),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 1,
-                                        blurRadius: 3,
-                                        offset: Offset(0, 3),
+                                    onTap: () {
+                                      showCategoryDetailsPopup(
+                                          context, category);
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 15),
+                                      decoration: BoxDecoration(
+                                        color: Color.fromRGBO(187, 233, 255,
+                                            1.0), // Corrected opacity
+                                        borderRadius: BorderRadius.circular(25),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 1,
+                                            blurRadius: 3,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                      child: Text(
+                                        category,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
                                   ),
-                                  child: Text(
-                                    category,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                              ),
-                            )
+                                )
                                 .toList(),
                           ),
                         ],
                       ),
                     ),
-
                     GestureDetector(
                         onTap: () {
                           FocusScope.of(context).unfocus();
@@ -697,9 +698,13 @@ class _AllocationPageState extends State<AllocationPage>
                           children: [
                             Container(
                               width: _isExpanded ? double.infinity : 500,
-                              height: _isExpanded ? 400 : 75, //adjust height here if needed
-                              child: Container( // Toggles expenses expanding
-                                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                              height: _isExpanded
+                                  ? 400
+                                  : 75, //adjust height here if needed
+                              child: Container(
+                                // Toggles expenses expanding
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 15),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(20),
@@ -709,15 +714,19 @@ class _AllocationPageState extends State<AllocationPage>
                                   children: [
                                     const SizedBox(height: 7),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text('Expenses', style: kMontserratBlackMedium),
+                                        const Text('Expenses',
+                                            style: kMontserratBlackMedium),
                                         IconButton(
                                           onPressed: () {
                                             _toggleExpenses();
                                           },
                                           icon: Icon(
-                                            _isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                            _isExpanded
+                                                ? Icons.arrow_drop_up
+                                                : Icons.arrow_drop_down,
                                           ),
                                         ),
                                       ],
@@ -730,33 +739,49 @@ class _AllocationPageState extends State<AllocationPage>
                                             FocusScope.of(context).unfocus();
                                           },
                                           child: Container(
-                                            width: 400, decoration: BoxDecoration(
-                                            color: const Color(0xffb1d4e0),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
+                                            width: 400,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xffb1d4e0),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                const SizedBox(width:10),
+                                                const SizedBox(width: 10),
                                                 Expanded(
                                                   child: TextField(
                                                     controller: _itemController,
                                                     decoration: InputDecoration(
                                                       labelText: 'Item',
-                                                      labelStyle: TextStyle(color: Colors.blueGrey),
-                                                      enabledBorder: UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                                      labelStyle: TextStyle(
+                                                          color:
+                                                              Colors.blueGrey),
+                                                      enabledBorder:
+                                                          UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .blueGrey
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            width: 2.0),
                                                       ),
-                                                      focusedBorder: const UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                                      focusedBorder:
+                                                          const UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.black45,
+                                                            width: 2.0),
                                                       ),
-                                                      contentPadding: EdgeInsets.only(bottom:1.0),
+                                                      contentPadding:
+                                                          EdgeInsets.only(
+                                                              bottom: 1.0),
                                                     ),
                                                   ),
                                                 ),
-
-
-                                                const SizedBox(width:10),
+                                                const SizedBox(width: 10),
                                                 Expanded(
                                                   child: TextButton(
                                                     onPressed: () {
@@ -772,8 +797,14 @@ class _AllocationPageState extends State<AllocationPage>
                                                                     ? categoryData.map((category) {
                                                                   return InkWell(
                                                                     onTap: (){
+                                                                      setState(() {
+                                                                        _selectedCategory = category;  // Save the selected category
+                                                                      });
                                                                       print('Category clicked: $category');
                                                                       Navigator.of(context).pop();
+
+
+
                                                                     },
                                                                     child: Padding(
                                                                       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -784,6 +815,8 @@ class _AllocationPageState extends State<AllocationPage>
                                                                           fontSize: 16,
 
                                                                         ),
+
+
                                                                       ),
                                                                     ),
 
@@ -812,33 +845,53 @@ class _AllocationPageState extends State<AllocationPage>
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(width:10),
+
+                                                const SizedBox(width: 10),
                                                 Expanded(
                                                   child: TextField(
-                                                    controller: _amountController,
+                                                    controller:
+                                                        _amountController,
                                                     decoration: InputDecoration(
                                                       labelText: 'Amount',
-                                                      labelStyle: TextStyle(color: Colors.blueGrey),
-                                                      enabledBorder: UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: Colors.blueGrey.withOpacity(0.5),width:2.0),
+                                                      labelStyle: TextStyle(
+                                                          color:
+                                                              Colors.blueGrey),
+                                                      enabledBorder:
+                                                          UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .blueGrey
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            width: 2.0),
                                                       ),
-                                                      focusedBorder: const UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: Colors.black45, width:2.0),
+                                                      focusedBorder:
+                                                          const UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.black45,
+                                                            width: 2.0),
                                                       ),
-                                                      contentPadding: EdgeInsets.only(bottom:1.0),
+                                                      contentPadding:
+                                                          EdgeInsets.only(
+                                                              bottom: 1.0),
                                                     ),
-                                                    keyboardType: TextInputType.number,
+                                                    keyboardType:
+                                                        TextInputType.number,
                                                   ),
                                                 ),
-
-                                                const SizedBox(width:1),
+                                                const SizedBox(width: 1),
                                                 Container(
-                                                  width:30,
+                                                  width: 30,
                                                   child: ElevatedButton(
-                                                    onPressed: _isEditingExpense ? () {} : _addExpense,
-                                                    style: ElevatedButton.styleFrom(
+                                                    onPressed: _isEditingExpense
+                                                        ? () {}
+                                                        : _addExpense,
+                                                    style: ElevatedButton
+                                                        .styleFrom(
                                                       shape: CircleBorder(),
-                                                      padding: EdgeInsets.all(0),
+                                                      padding:
+                                                          EdgeInsets.all(0),
                                                     ),
                                                     child: const Icon(
                                                       Icons.add,
@@ -846,34 +899,110 @@ class _AllocationPageState extends State<AllocationPage>
                                                     ),
                                                   ),
                                                 ),
-
-                                                const SizedBox(width:10),
-
+                                                const SizedBox(width: 10),
                                               ],
                                             ),
                                           ),
                                         ),
                                       ),
-
-
-                                    const SizedBox(height:20),
+                                    Expanded(
+                                        child: ListView.builder(
+                                            itemCount: expenses.length,
+                                            itemBuilder: (context, index) {
+                                              final expense = expenses[index];
+                                              return Card(
+                                                  margin: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 10),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        gradient:
+                                                            kLinearGradient,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10)),
+                                                    child: ListTile(
+                                                      title: Text(
+                                                        expense.item,
+                                                        style:
+                                                            kMontserratWhiteMedium,
+                                                      ),
+                                                      subtitle: Text(
+                                                          expense.category,
+                                                          style:
+                                                              kNormalSansWhiteMini),
+                                                      trailing: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 8.0),
+                                                            child: Text(
+                                                                '\$${expense.amount.toStringAsFixed(2)}',
+                                                                style:
+                                                                    kNormalSansWhiteMini),
+                                                          ),
+                                                          PopupMenuButton<
+                                                                  String>(
+                                                              icon: const Icon(
+                                                                  Icons
+                                                                      .more_vert,
+                                                                  color: Colors
+                                                                      .white),
+                                                              itemBuilder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return [
+                                                                  const PopupMenuItem<
+                                                                      String>(
+                                                                    value:
+                                                                        'edit',
+                                                                    child: Text(
+                                                                        'Edit'),
+                                                                  ),
+                                                                  const PopupMenuItem<
+                                                                      String>(
+                                                                    value:
+                                                                        'delete',
+                                                                    child: Text(
+                                                                        'Delete'),
+                                                                  ),
+                                                                ];
+                                                              },
+                                                              onSelected:
+                                                                  (value) {
+                                                                if (value ==
+                                                                    'edit') {
+                                                                  _editExpense(
+                                                                      index);
+                                                                } else if (value ==
+                                                                    'delete') {
+                                                                  _deleteExpense(
+                                                                      index);
+                                                                }
+                                                              })
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ));
+                                            })),
+                                    const SizedBox(height: 20),
                                   ],
                                 ),
                               ),
-
                             ),
-
-                            const SizedBox(height:40),
-
+                            const SizedBox(height: 40),
                           ],
-                        )
-                    ),
+                        )),
                   ],
-                )
-            ),
+                )),
           ],
         ),
-      ),);
+      ),
+    );
   }
 }
-

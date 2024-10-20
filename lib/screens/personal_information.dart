@@ -103,7 +103,7 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
   //This function loads the image from firebase Storage
   Future<void> _loadProfileImageUrl()async{
     final userDoc = await FirebaseFirestore.instance
-        .collection('users')
+        .collection('userData')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
     setState(() {

@@ -107,30 +107,50 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
     setState(() {
-      profileImageUrl = userDoc.data()?['profileImageUrl'];
+      if (userDoc.exists) {
+        profileImageUrl = userDoc.data()?['profileImageUrl'];
+      } else {
+        profileImageUrl = null; // Set a default value if no profile image is found
+      }
     });
   }
   //Save image
-  Future<void> _saveImage()async{
+  Future<void> _saveImage() async {
     if (image == null) return;
-    try{
+    try {
+      print('Starting image upload...');
       final ref = FirebaseStorage.instance
           .ref()
           .child("images/${image!.name}");
 
       uploadTask = ref.putFile(File(image!.path));
       final snapshot = await uploadTask!.whenComplete(() => null);
+      print('Image upload completed...');
 
-      //Getting the download URL to Firebase
+      // Get the download URL after upload
       final downloadUrl = await snapshot.ref.getDownloadURL();
-      // Save the download URL to Firebase
+      print('Download URL: $downloadUrl');  // Debugging point: print download URL
+
+      // Save the download URL to Firestore
       await FirebaseFirestore.instance
-          .collection('users').doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('userData')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
           .update({'profileImageUrl': downloadUrl});
-    }catch (e){
+      print('Image URL saved to Firestore');  // Debugging point: confirm Firestore update
+
+      // Trigger UI update by calling setState to update the profileImageUrl variable
+      setState(() {
+        profileImageUrl = downloadUrl; // Update the profile image URL for the CircleAvatar
+      });
+      print('UI updated with new image URL');
+
+    } catch (e) {
       print('Error uploading image: $e');
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context){

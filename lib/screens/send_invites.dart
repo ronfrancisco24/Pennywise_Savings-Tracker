@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/data/firebase_data.dart';
@@ -19,8 +20,19 @@ class _SendInviteScreenState extends State<SendInviteScreen> {
     if (currentUser != null && _emailController.text.isNotEmpty) {
       String senderId = currentUser.uid;
       String senderEmail = currentUser.email ?? "unknown";
+      String recipientEmail = _emailController.text.trim();
 
+      //Check if the email is valid
       try {
+        //check if the recipient email exists in Firestore
+        bool emailExists = await _checkEmailExists(recipientEmail);
+        if (!emailExists){
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('No user found with that email')),
+          );
+          return;
+        }
+        // Send the invite
         await firebaseData.sendFriendInvite(
           senderId: senderId,
           recipientEmail: _emailController.text,
@@ -42,7 +54,14 @@ class _SendInviteScreenState extends State<SendInviteScreen> {
     }
   }
 
-
+  Future<bool> _checkEmailExists(String email) async {
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('userData')
+        .where('email', isEqualTo: email)
+        .get();
+    // if the result contrains documents, that means the email exists
+    return result.docs.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:savings_2/widgets/personalPrompt.dart';
 
 class FirebaseData {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userData = FirebaseFirestore.instance.collection('userData');
-  final CollectionReference invitesCollection = FirebaseFirestore.instance.collection('invitations');
+  final CollectionReference invitesCollection = FirebaseFirestore.instance
+      .doc(userID)
+      .collection('invitations');
 
   // ---------- Savings, Expenses, and Categories Logic  ----------
 

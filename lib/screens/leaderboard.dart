@@ -135,21 +135,21 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              ElevatedButton(
-                                onPressed: () {
-                                  inviteCode = generateInviteCode("My ID Code");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => InvitationPage(inviteCode: inviteCode),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  'Invite Friends',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
+                              // ElevatedButton(
+                              //   onPressed: () {
+                              //     inviteCode = generateInviteCode("My ID Code");
+                              //     Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(
+                              //         builder: (context) => InvitationPage(inviteCode: inviteCode),
+                              //       ),
+                              //     );
+                              //   },
+                              //   child: const Text(
+                              //     'Invite Friends',
+                              //     style: TextStyle(color: Colors.black),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ],

@@ -4,7 +4,9 @@ import 'home_page.dart';
 import '../widgets/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:savings_2/authentication/auth_service.dart';
-import 'package:savings_2/screens/invitationpage.dart';
+// import 'package:savings_2/screens/invitationpage.dart';
+import 'pending_invites.dart';
+import 'send_invites.dart';
 
 
 class ProfilePage extends StatefulWidget {
@@ -177,10 +179,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         TextButton(
                           onPressed: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => EnterInviteCodePage(), // Navigate to the invitation input page
+                            //   ),
+                            // );
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EnterInviteCodePage(), // Navigate to the invitation input page
+                                  builder: (context)=> PendingInvitesScreen(),
                               ),
                             );
                           },
@@ -193,7 +201,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               SizedBox(width: 10),
                               Text(
-                                'Connect with Friends',
+                                'View invites',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,
@@ -211,6 +219,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         TextButton(
                           onPressed: () {
                             // Need pa ng pages
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context)=> SendInviteScreen(),
+                              ),
+                            );
                           },
                           child: Row(
                             children: [

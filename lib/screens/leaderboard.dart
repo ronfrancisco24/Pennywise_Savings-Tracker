@@ -49,14 +49,15 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
     final username = authService.getUserName();
     userEntry = [
       BoardEntry(name: "$username", amount: 1238.34),
+      //TODO: call the amount from tracker.dart
     ];
     entries = [
       // BoardEntry(name: "", amount: ), for entry purposes
       BoardEntry(name: "Jaja", amount: 1234.78),
       BoardEntry(name: "Joseph", amount: 20070.60),
-      BoardEntry(name: "Sean", amount: 10560.34),
-      BoardEntry(name: "Joaquin", amount: 8900.91),
-      BoardEntry(name: "Helaina", amount: 9340.34),
+      // BoardEntry(name: "Sean", amount: 10560.34),
+      // BoardEntry(name: "Joaquin", amount: 8900.91),
+      // BoardEntry(name: "Helaina", amount: 9340.34),
     ];
 
     entries.addAll(userEntry);
@@ -76,7 +77,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage> {
           child: Column(
             children: [
               Container(
-                height: 800,
+                height: 900,
                 decoration: const BoxDecoration(
                   gradient: kLinearGradient,
                 ),

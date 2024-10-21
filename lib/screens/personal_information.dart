@@ -31,30 +31,6 @@ class _PersonalInfoPageState extends State <PersonalInfoPage>{
   XFile? image;
   UploadTask? uploadTask;
 
-  // //Changing the Profile pic
-  // final ChangeProfilePic _profilePicHandler = ChangeProfilePic();
-  // File? _profileImage;
-  // String? _downloadUrl;
-  //
-  // // Callback to update UI after an image is picked and uploaded
-  // void _updateProfilePicture() async{
-  //   //Trigger profile picture upload
-  //   await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
-  //   setState(() {
-  //     //was _profileImage
-  //     _profileImage = _profilePicHandler.getImage();
-  //     _downloadUrl = _profilePicHandler.getDownloadUrl();
-  //   });
-  // }
-  //
-  // //Uploading the profile picture to the firebase storage
-  // void _uploadProfilePicture() async{
-  //   await _profilePicHandler.pickAndUploadImage(ImageSource.gallery);
-  //   String? imageUrl = _profilePicHandler.getDownloadUrl();
-  //   if(imageUrl != null){
-  //     print('Uploaded Image URL: $imageUrl');
-  //   }
-  // }
   String? profileImageUrl;
 
   @override

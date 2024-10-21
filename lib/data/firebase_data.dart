@@ -45,7 +45,6 @@ class FirebaseData {
         'budget': FieldValue.delete(),
         'totalAmountSaved': FieldValue.delete(),
         'startDate': FieldValue.delete(),
-        'lastUpdatedDate': FieldValue.delete(),
       });
     } catch (e) {
       print('error unseeting fields $e');
@@ -62,10 +61,13 @@ class FirebaseData {
 
   // adds expenses data
   //TODO Step 1. add data in product.
+  //TODO use the current day to refer to the day.
+
   Future<String?> addExpensesData(
       {required String userId,
       required String product,
-      required double price}) async {
+      required double price,
+      required currentDay}) async {
     try {
       DocumentReference docRef = await userData
           .doc(userId)
@@ -84,21 +86,49 @@ class FirebaseData {
     return userData.doc(userId).collection('expenses').snapshots();
   }
 
+  //TODO: update total amount saved with new total saved
+
   Future<void> updateTotalAmountSaved({
     required String userId,
     required double newTotalAmountSaved,
   }) async {
     try {
+
+      DateTime lastUpdateDate = DateTime.now();
       await userData
           .doc(userId)
           .collection('savings')
           .doc('personal_savings')
           .update({
-        'totalAmountSaved': newTotalAmountSaved
+        'totalAmountSaved': newTotalAmountSaved,
+        'lastUpdatedDate' : lastUpdateDate
       }); // Update the totalSaved field
       print('Total saved updated successfully for user: $userId');
     } catch (e) {
       print('Error updating total saved: $e');
+    }
+  }
+
+  Future<double?> fetchTotalAmountSaved({
+    required String userId,
+  }) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> doc = await userData
+          .doc(userId)
+          .collection('savings')
+          .doc('personal_savings')
+          .get();
+
+      if (doc.exists) {
+        // Retrieve the totalAmountSaved field, or return null if it doesn't exist
+        return doc.data()?['totalAmountSaved'] as double?;
+      } else {
+        // Document does not exist, return null or 0.0 as needed
+        print('error fetching total amount saved.');
+        return 0.0;
+      }
+    } catch (e) {
+      print('error fetching totalAmountSaved $e');
     }
   }
 

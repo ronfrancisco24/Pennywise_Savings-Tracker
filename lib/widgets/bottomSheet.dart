@@ -52,6 +52,7 @@ Future<void> kAddingBottomSheet({
                           userId: userId,
                           product: product,
                           price: parsedPrice,
+                          currentDay: currentDay
                         );
 
                         // update calculator with new expense

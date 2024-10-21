@@ -13,6 +13,8 @@ void showPromptPopup(BuildContext context) {
   TextEditingController daysRemainingController = TextEditingController();
   TextEditingController budgetController = TextEditingController();
 
+  String errorMessage = ''; // State variable for error messages
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -53,6 +55,13 @@ void showPromptPopup(BuildContext context) {
                   border: OutlineInputBorder(),
                 ),
               ),
+              SizedBox(height: 10),
+              // Display error message
+              if (errorMessage.isNotEmpty)
+                Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
             ],
           ),
         ),
@@ -77,26 +86,30 @@ void showPromptPopup(BuildContext context) {
               double totalSaved = 0;
 
               if (goal != null && days != null && budgetValue != null) {
-
-                // make sure that savings goal is lower than budget.
-
-                if (budgetValue > goal) {
+                // Check for conditions and update error message if necessary
+                if (budgetValue < goal) {
+                  errorMessage = 'The target goal cannot be lower than the budget.';
+                } else if (days > 30) {
+                  errorMessage = 'Days remaining cannot exceed 30.';
+                } else {
+                  // Clear error message if everything is valid
+                  errorMessage = '';
                   fireStore.addSavingsData(
                     userId: userID.toString(),
                     goal: goal,
                     days: days,
-                    budget: budgetValue, totalAmountSaved: totalSaved,
+                    budget: budgetValue,
+                    totalAmountSaved: totalSaved,
                   );
-                } else {
-                  print('The target goal cannot be higher than the budget.');
+                  Navigator.of(context).pop(); // Close the dialog after successful submission
+                  return; // Exit early to prevent the dialog from closing prematurely
                 }
-
               } else {
-                print(
-                    'Please enter valid numbers for goal, days, and budget.');
+                errorMessage = 'Please enter valid numbers for goal, days, and budget.';
               }
-              Navigator.of(context)
-                  .pop(); // Close the dialog after submission
+
+              // Trigger a rebuild to show the error message
+              (context as Element).markNeedsBuild();
             },
             child: Text('Submit'),
           ),

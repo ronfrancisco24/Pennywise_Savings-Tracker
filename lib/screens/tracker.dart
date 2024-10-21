@@ -26,6 +26,7 @@ class _TrackerPageState extends State<TrackerPage>
 
   double todaysBudget = 0;
   double todaysGoal = 0;
+  List<double> todaysGoalList = [];
 
   @override
   void initState() {
@@ -81,14 +82,18 @@ class _TrackerPageState extends State<TrackerPage>
           builder: (context, snapshot) {
             // Default values
             double goal = 0;
+
             int totalDays = 0;
             int daysRemaining = 0;
             int latestDay = 0;
+            DateTime? startDate;
+
+            double totalExpenses = 0;
+
+            double previousTotalSaved = 0;
+            double totalSaved = 0;
 
             double budget = 0;
-            DateTime? startDate;
-            double totalExpenses = 0;
-            double totalSaved = 0;
             double displayedBudget = 0;
 
             // check connection state
@@ -113,6 +118,14 @@ class _TrackerPageState extends State<TrackerPage>
                 totalDays = (data['days'] ?? 0).toInt();
                 budget = (data['budget'] ?? 0).toDouble();
 
+                double fireStoreTotalSaved =
+                    (data['totalAmountSaved'] ?? 0).toDouble();
+
+                // if (totalSaved > fireStoreTotalSaved) {
+                //   fireStore.updateTotalAmountSaved(
+                //       userId: userID, newTotalAmountSaved: totalSaved);
+                // }
+
                 // fetch the start date
                 Timestamp? startTimestamp = data['startDate'] as Timestamp?;
                 if (startTimestamp != null) {
@@ -127,7 +140,7 @@ class _TrackerPageState extends State<TrackerPage>
                       ? totalDays - daysRemaining
                       : totalDays - 1;
 
-                  if (daysRemaining == 0){
+                  if (daysRemaining == 0) {
                     fireStore.resetSavingsData(userId: userID);
                   }
 
@@ -145,18 +158,20 @@ class _TrackerPageState extends State<TrackerPage>
                       daysElapsed.clamp(0, dailyBudgets.length - 1);
 
 // access today's budget and goal
-                  todaysBudget = dailyBudgets.isNotEmpty ? dailyBudgets[currentDayIndex] : 0;
+                  todaysBudget = dailyBudgets.isNotEmpty
+                      ? dailyBudgets[currentDayIndex]
+                      : 0;
                   displayedBudget = todaysBudget < 0 ? 0 : todaysBudget;
 
                   todaysGoal = dailyGoals.isNotEmpty &&
                           currentDayIndex < dailyGoals.length
                       ? dailyGoals[currentDayIndex]
                       : 0;
-                  List<double> todaysGoalList = [];
+
                   todaysGoalList.add(todaysGoal);
 
+                  //TODO: add to amountSaved database.
                   totalSaved = todaysGoalList.reduce((a, b) => a + b);
-
                 }
               }
             }

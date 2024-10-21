@@ -34,13 +34,12 @@ class _TrackerPageState extends State<TrackerPage>
 
     if (user != null) {
       userID = user.uid.toString();
-
       controller = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
       )..addListener(() {
-        setState(() {});
-      });
+          setState(() {});
+        });
       // controller.repeat(reverse: false);
     }
   }
@@ -92,7 +91,6 @@ class _TrackerPageState extends State<TrackerPage>
             double totalSaved = 0;
             double displayedBudget = 0;
 
-
             // check connection state
 
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -125,22 +123,39 @@ class _TrackerPageState extends State<TrackerPage>
                   DateTime currentDate = DateTime.now();
                   int daysElapsed = currentDate.difference(startDate).inDays;
                   daysRemaining = (totalDays - daysElapsed).clamp(0, totalDays);
-                  latestDay = totalDays - daysRemaining;
+                  latestDay = daysRemaining > 0
+                      ? totalDays - daysRemaining
+                      : totalDays - 1;
+
+                  if (daysRemaining == 0){
+                    fireStore.resetSavingsData(userId: userID);
+                  }
 
                   final CoinCalculator calculator = CoinCalculator(
                       availableBudget: budget,
                       targetGoal: goal,
                       days: daysRemaining);
 
-                  List<double> dailyBudgets = calculator.calculateDailyBudgets();
+                  List<double> dailyBudgets =
+                      calculator.calculateDailyBudgets();
                   List<double> dailyGoals = calculator.calculateDailyGoal();
 
-                  int currentDayIndex = daysElapsed.clamp(0, dailyBudgets.length);
+                  // Calculate current day index
+                  int currentDayIndex =
+                      daysElapsed.clamp(0, dailyBudgets.length - 1);
 
+// access today's budget and goal
                   todaysBudget = dailyBudgets.isNotEmpty ? dailyBudgets[currentDayIndex] : 0;
                   displayedBudget = todaysBudget < 0 ? 0 : todaysBudget;
 
-                  todaysGoal = dailyGoals.isNotEmpty ? dailyGoals[currentDayIndex] : 0;
+                  todaysGoal = dailyGoals.isNotEmpty &&
+                          currentDayIndex < dailyGoals.length
+                      ? dailyGoals[currentDayIndex]
+                      : 0;
+                  List<double> todaysGoalList = [];
+                  todaysGoalList.add(todaysGoal);
+
+                  totalSaved = todaysGoalList.reduce((a, b) => a + b);
 
                 }
               }
@@ -232,14 +247,14 @@ class _TrackerPageState extends State<TrackerPage>
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '₱ 0.00',
+                                            '₱ ${totalSaved.toStringAsFixed(2)}',
                                             style: kMontserratWhiteLarge,
                                           ),
                                           Opacity(
@@ -274,11 +289,11 @@ class _TrackerPageState extends State<TrackerPage>
                                   SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Budget',
@@ -292,7 +307,7 @@ class _TrackerPageState extends State<TrackerPage>
                                       ),
                                       Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Target Goal',
@@ -306,7 +321,7 @@ class _TrackerPageState extends State<TrackerPage>
                                       ),
                                       Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Days Remaining',
@@ -332,7 +347,7 @@ class _TrackerPageState extends State<TrackerPage>
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Today's Target",
                                           style: kMontserratWhiteMedium),
@@ -344,7 +359,7 @@ class _TrackerPageState extends State<TrackerPage>
                                   ),
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Today's Budget",
                                           style: kMontserratWhiteMedium),
@@ -370,7 +385,10 @@ class _TrackerPageState extends State<TrackerPage>
                                             context: context,
                                             userId: userID,
                                             currentDay: latestDay,
-                                            calculator: CoinCalculator(availableBudget: budget, targetGoal: goal, days: daysRemaining));
+                                            calculator: CoinCalculator(
+                                                availableBudget: budget,
+                                                targetGoal: goal,
+                                                days: daysRemaining));
                                       },
                                       child: Icon(
                                         Icons.add,
@@ -410,9 +428,9 @@ class _TrackerPageState extends State<TrackerPage>
                           itemBuilder: (context, index) {
                             var expenseData = expenses[index].data();
                             String product = expenseData[
-                            'product']; // takes the product field
+                                'product']; // takes the product field
                             double price =
-                            expenseData['price']; // takes the price field
+                                expenseData['price']; // takes the price field
                             var expenseID = expenses[index].id;
 
                             // Ensure expenses[index] is not null
@@ -429,10 +447,10 @@ class _TrackerPageState extends State<TrackerPage>
 
                             return Padding(
                               padding:
-                              const EdgeInsets.symmetric(vertical: 5.0),
+                                  const EdgeInsets.symmetric(vertical: 5.0),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Expanded(
@@ -455,7 +473,7 @@ class _TrackerPageState extends State<TrackerPage>
                                         currentProduct: product,
                                         // Pass the current product name
                                         currentPrice:
-                                        price, // Pass the current price
+                                            price, // Pass the current price
                                       );
                                     },
                                     child: Icon(
@@ -470,9 +488,7 @@ class _TrackerPageState extends State<TrackerPage>
                                       await fireStore.deleteExpensesData(
                                           userID: userID, expenseID: expenseID);
                                       coinCalculator.deleteExpense(expenseID);
-                                      setState(() {
-
-                                      });
+                                      setState(() {});
                                     },
                                     child: Icon(
                                       Icons.delete,
@@ -508,11 +524,7 @@ class _TrackerPageState extends State<TrackerPage>
 //TODO: incorporate addExpense and deleteExpense method form coin calculator.
 //
 
-
-
-
 // Other pages
 //TODO: leaderboard implementation
 //TODO: knapsack algorithm
 //TODO: allocator implementation
-

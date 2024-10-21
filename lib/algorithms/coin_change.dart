@@ -102,9 +102,13 @@ class CoinCalculator {
     // Optionally recalculate your budget and goals here
   }
 
-  void calculateSavings() {
-    totalSaved = dailySavings
-        .reduce((a, b) => a + b); // adds daily savings to total saved.
+  void calculateSavings(int currentDay) {
+    if (currentDay >= 0 && currentDay < days) {
+      // Sum up all savings from previous days (including today)
+      totalSaved = dailySavings.sublist(0, currentDay + 1).reduce((a, b) => a + b);
+    } else {
+      print("Invalid day index for savings calculation.");
+    }
   }
 
   // Calculate the total amount spent so far
@@ -147,7 +151,6 @@ void main() {
   calculator.addExpense('001', 'Coffee', 43, 0); // day 1
   calculator.addExpense('001', 'Coffee', 100, 0); // day 1
   calculator.addExpense('001', 'Coffee', 43, 1); // day 1
-  calculator.calculateSavings();
 
   // Recalculate values after the expenses
   print('Daily Goals after expenses: ${calculator.dailySavings}');

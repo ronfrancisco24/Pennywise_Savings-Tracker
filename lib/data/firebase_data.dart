@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseData {
   final CollectionReference userData =
-  FirebaseFirestore.instance.collection('userData');
+      FirebaseFirestore.instance.collection('userData');
 
   Future<void> addSavingsData({
     required String userId,
@@ -13,7 +13,8 @@ class FirebaseData {
   }) async {
     try {
       DateTime startDate =
-      DateTime.now(); // gets the first day of days remaining
+          DateTime.now(); // gets the first day of days remaining
+      DateTime lastUpdatedDate = DateTime.now();
 
       await userData
           .doc(userId)
@@ -24,11 +25,30 @@ class FirebaseData {
         'days': days,
         'budget': budget,
         'totalAmountSaved': totalAmountSaved,
-        'startDate': startDate
+        'startDate': startDate,
       });
       print('Savings data added successfully for user: $userId');
     } catch (e) {
       print('Error adding savings data: $e');
+    }
+  }
+
+  void resetSavingsData({required String userId}) async {
+    try {
+      await userData
+          .doc(userId)
+          .collection('savings')
+          .doc('personal_savings')
+          .update({
+        'goal': FieldValue.delete(),
+        'days': FieldValue.delete(),
+        'budget': FieldValue.delete(),
+        'totalAmountSaved': FieldValue.delete(),
+        'startDate': FieldValue.delete(),
+        'lastUpdatedDate': FieldValue.delete(),
+      });
+    } catch (e) {
+      print('error unseeting fields $e');
     }
   }
 
@@ -44,8 +64,8 @@ class FirebaseData {
   //TODO Step 1. add data in product.
   Future<String?> addExpensesData(
       {required String userId,
-        required String product,
-        required double price}) async {
+      required String product,
+      required double price}) async {
     try {
       DocumentReference docRef = await userData
           .doc(userId)
@@ -73,7 +93,9 @@ class FirebaseData {
           .doc(userId)
           .collection('savings')
           .doc('personal_savings')
-          .update({'totalAmountSaved': newTotalAmountSaved}); // Update the totalSaved field
+          .update({
+        'totalAmountSaved': newTotalAmountSaved
+      }); // Update the totalSaved field
       print('Total saved updated successfully for user: $userId');
     } catch (e) {
       print('Error updating total saved: $e');
@@ -84,13 +106,14 @@ class FirebaseData {
 
   Future<void> updateExpensesData(
       {required String userId,
-        required String expenseId,
-        required String product,
-        required double price}) async {
+      required String expenseId,
+      required String product,
+      required double price}) async {
     try {
       await userData.doc(userId).collection('expenses').doc(expenseId).update(
           {'product': product, 'price': price}); // uses the update in firestore
-      print('Expenses data added successfully for user: $userId');} catch (e) {
+      print('Expenses data added successfully for user: $userId');
+    } catch (e) {
       print('Error adding savings data: $e');
     }
   }
@@ -108,13 +131,12 @@ class FirebaseData {
 
   Future<void> addCategoryData(
       {required String userID,
-        required String category,
-        required int priorityLevel}) async {
+      required String category,
+      required int priorityLevel}) async {
     try {
       await userData.doc(userID).collection('categories').add({
         'category': category,
         'priority_level': priorityLevel,
-
       });
       print('Expenses data added successfully for user: $userID');
     } catch (e) {
@@ -125,7 +147,4 @@ class FirebaseData {
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchCategoryData(String userId) {
     return userData.doc(userId).collection('categories').snapshots();
   }
-
 }
-
-

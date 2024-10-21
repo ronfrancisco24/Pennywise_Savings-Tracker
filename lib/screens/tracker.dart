@@ -500,9 +500,15 @@ class _TrackerPageState extends State<TrackerPage>
 }
 
 // Tracker page
-//TODO: incorporate addExpense and deleteExpense method form coin calculator.
 //TODO: everyday a day ends, it will keep track of the added expense
+// add progress to linear indicator.
+
 //TODO: create conditional dialogs
+
+//TODO: incorporate addExpense and deleteExpense method form coin calculator.
+//
+
+
 
 
 // Other pages

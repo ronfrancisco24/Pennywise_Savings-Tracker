@@ -45,6 +45,7 @@ class _InvitationPageState extends State<InvitationPage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        bottomSheet: kBottomAppBar(context),
         appBar: AppBar(
           centerTitle: true,
           title: const Text('Your Invite Code'),

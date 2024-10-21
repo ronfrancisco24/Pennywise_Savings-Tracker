@@ -17,26 +17,31 @@ class _SendInviteScreenState extends State<SendInviteScreen> {
     User? currentUser = authService.getCurrentUser();
 
     if (currentUser != null && _emailController.text.isNotEmpty) {
-      String senderId = currentUser.uid; // Get userId from the current user
+      String senderId = currentUser.uid;
       String senderEmail = currentUser.email ?? "unknown";
 
-      await firebaseData.sendFriendInvite(
-        senderId: senderId,
-        recipientEmail: _emailController.text,
-        senderName: senderEmail,
-      );
+      try {
+        await firebaseData.sendFriendInvite(
+          senderId: senderId,
+          recipientEmail: _emailController.text,
+          senderName: senderEmail,
+        );
 
-      // Feedback to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invite sent to ${_emailController.text}!')),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invite sent to ${_emailController.text}!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send invite: $e')),
+        );
+      }
     } else {
-      // Handle cases where userId or email might be null
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send invite. Please check your input.')),
+        SnackBar(content: Text('Please check your input.')),
       );
     }
   }
+
 
 
   @override

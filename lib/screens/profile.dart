@@ -201,7 +201,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               SizedBox(width: 10),
                               Text(
-                                'View invites',
+                                'Pending invites',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,

@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // get current user
   User? getCurrentUser() {
@@ -79,4 +81,29 @@ class AuthService {
     return _auth.currentUser?.displayName;
   }
 
+
+  // Method to send an invite
+  Future<void> sendInvite(String recipientEmail) async {
+    // Get the current user's ID
+    User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      print("User is not authenticated. Cannot send invite.");
+      return;
+    }
+
+    String senderId = currentUser.uid; // Use userId from Firebase Auth
+    try {
+      // Create an invite document
+      await _firestore.collection('invites').add({
+        'senderId': senderId,
+        'recipientEmail': recipientEmail,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      print("Invite sent to $recipientEmail from $senderId");
+    } catch (e) {
+      print("Failed to send invite: $e");
+      // Handle error (e.g., show an alert or snackbar)
+    }
+  }
 }

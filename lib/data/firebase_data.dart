@@ -9,13 +9,23 @@ class FirebaseData {
     required double goal,
     required int days,
     required double budget,
+    required double totalAmountSaved,
   }) async {
     try {
+      DateTime startDate =
+      DateTime.now(); // gets the first day of days remaining
+
       await userData
           .doc(userId)
           .collection('savings')
           .doc('personal_savings')
-          .set({'goal': goal, 'days': days, 'budget': budget});
+          .set({
+        'goal': goal,
+        'days': days,
+        'budget': budget,
+        'totalAmountSaved': totalAmountSaved,
+        'startDate': startDate
+      });
       print('Savings data added successfully for user: $userId');
     } catch (e) {
       print('Error adding savings data: $e');
@@ -52,6 +62,22 @@ class FirebaseData {
   // fetches expenses data
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchExpensesData(String userId) {
     return userData.doc(userId).collection('expenses').snapshots();
+  }
+
+  Future<void> updateTotalAmountSaved({
+    required String userId,
+    required double newTotalAmountSaved,
+  }) async {
+    try {
+      await userData
+          .doc(userId)
+          .collection('savings')
+          .doc('personal_savings')
+          .update({'totalAmountSaved': newTotalAmountSaved}); // Update the totalSaved field
+      print('Total saved updated successfully for user: $userId');
+    } catch (e) {
+      print('Error updating total saved: $e');
+    }
   }
 
   // update data

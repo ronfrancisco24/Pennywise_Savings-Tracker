@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseData {
-  final CollectionReference userData =
-      FirebaseFirestore.instance.collection('userData');
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CollectionReference userData = FirebaseFirestore.instance.collection('userData');
+  final CollectionReference invitesCollection = FirebaseFirestore.instance.collection('invitations');
+
+  // ---------- Savings, Expenses, and Categories Logic  ----------
 
   Future<void> addSavingsData({
     required String userId,
@@ -12,8 +17,7 @@ class FirebaseData {
     required double totalAmountSaved,
   }) async {
     try {
-      DateTime startDate =
-          DateTime.now(); // gets the first day of days remaining
+      DateTime startDate = DateTime.now();
       DateTime lastUpdatedDate = DateTime.now();
 
       await userData
@@ -26,6 +30,7 @@ class FirebaseData {
         'budget': budget,
         'totalAmountSaved': totalAmountSaved,
         'startDate': startDate,
+        'lastUpdatedDate': lastUpdatedDate,
       });
       print('Savings data added successfully for user: $userId');
     } catch (e) {
@@ -48,7 +53,7 @@ class FirebaseData {
         'lastUpdatedDate': FieldValue.delete(),
       });
     } catch (e) {
-      print('error unseeting fields $e');
+      print('Error resetting savings data: $e');
     }
   }
 
@@ -60,26 +65,23 @@ class FirebaseData {
         .snapshots();
   }
 
-  // adds expenses data
-  //TODO Step 1. add data in product.
-  Future<String?> addExpensesData(
-      {required String userId,
-      required String product,
-      required double price}) async {
+  Future<String?> addExpensesData({
+    required String userId,
+    required String product,
+    required double price,
+  }) async {
     try {
       DocumentReference docRef = await userData
           .doc(userId)
           .collection('expenses')
           .add({'product': product, 'price': price});
       print('Expenses data added successfully for user: $userId');
-      var expenseID = docRef.id;
-      return expenseID;
+      return docRef.id;
     } catch (e) {
-      print('Error adding savings data: $e');
+      print('Error adding expenses data: $e');
     }
   }
 
-  // fetches expenses data
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchExpensesData(String userId) {
     return userData.doc(userId).collection('expenses').snapshots();
   }
@@ -93,58 +95,140 @@ class FirebaseData {
           .doc(userId)
           .collection('savings')
           .doc('personal_savings')
-          .update({
-        'totalAmountSaved': newTotalAmountSaved
-      }); // Update the totalSaved field
+          .update({'totalAmountSaved': newTotalAmountSaved});
       print('Total saved updated successfully for user: $userId');
     } catch (e) {
       print('Error updating total saved: $e');
     }
   }
 
-  // update data
-
-  Future<void> updateExpensesData(
-      {required String userId,
-      required String expenseId,
-      required String product,
-      required double price}) async {
+  Future<void> updateExpensesData({
+    required String userId,
+    required String expenseId,
+    required String product,
+    required double price,
+  }) async {
     try {
-      await userData.doc(userId).collection('expenses').doc(expenseId).update(
-          {'product': product, 'price': price}); // uses the update in firestore
-      print('Expenses data added successfully for user: $userId');
+      await userData
+          .doc(userId)
+          .collection('expenses')
+          .doc(expenseId)
+          .update({'product': product, 'price': price});
+      print('Expenses data updated successfully for user: $userId');
     } catch (e) {
-      print('Error adding savings data: $e');
+      print('Error updating expenses data: $e');
     }
   }
 
-  // delete data
-
-  Future<void> deleteExpensesData(
-      {required String userID, required String expenseID}) async {
+  Future<void> deleteExpensesData({
+    required String userID,
+    required String expenseID,
+  }) async {
     try {
       await userData.doc(userID).collection('expenses').doc(expenseID).delete();
     } catch (e) {
-      print('Error deleting expense: ${e}');
+      print('Error deleting expense: $e');
     }
   }
 
-  Future<void> addCategoryData(
-      {required String userID,
-      required String category,
-      required int priorityLevel}) async {
+  Future<void> addCategoryData({
+    required String userID,
+    required String category,
+    required int priorityLevel,
+  }) async {
     try {
       await userData.doc(userID).collection('categories').add({
         'category': category,
         'priority_level': priorityLevel,
       });
-      print('Expenses data added successfully for user: $userID');
+      print('Category data added successfully for user: $userID');
     } catch (e) {
-      print('Error adding savings data: $e');
+      print('Error adding category data: $e');
     }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchCategoryData(String userId) {
     return userData.doc(userId).collection('categories').snapshots();
+  }
+
+  // ---------- Friend Invitations and Network Logic  ----------
+
+  // Add invite to Firestore
+  Future<void> sendFriendInvite({
+    required String senderId,
+    required String recipientEmail, // Invitee's email
+    required String senderName, // Optional: so invitee can see who invited them
+  }) async {
+    try {
+      // Check if recipient exists in the database
+      QuerySnapshot recipientSnapshot = await userData.where('email', isEqualTo: recipientEmail).get();
+
+      if (recipientSnapshot.docs.isNotEmpty) {
+        // Get recipient ID
+        String recipientId = recipientSnapshot.docs.first.id;
+
+        // Create an invite entry
+        await invitesCollection.add({
+          'senderId': senderId,
+          'recipientId': recipientId,
+          'status': 'pending', // Pending by default
+          'timestamp': FieldValue.serverTimestamp(), // Track when the invite was sent
+        });
+
+        print('Invite sent to: $recipientEmail');
+      } else {
+        print('Error: No user found with email $recipientEmail');
+      }
+    } catch (e) {
+      print('Error sending invite: $e');
+    }
+  }
+
+  // Accept invite
+  Future<void> acceptInvite({
+    required String inviteId,
+    required String userId,
+  }) async {
+    try {
+      // Update invite status to accepted
+      await invitesCollection.doc(inviteId).update({
+        'status': 'accepted',
+        'acceptedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Optionally add the user to a 'friends' subcollection
+      await userData.doc(userId).collection('friends').doc(inviteId).set({
+        'inviteId': inviteId,
+        'friendId': userId,
+        'friendshipStart': FieldValue.serverTimestamp(),
+      });
+
+      print('Invite accepted for user: $userId');
+    } catch (e) {
+      print('Error accepting invite: $e');
+    }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchPendingInvites(String userId) {
+    return invitesCollection
+        .where('recipientId', isEqualTo: userId)
+        .where('status', isEqualTo: 'pending')
+        .snapshots() as Stream<QuerySnapshot<Map<String, dynamic>>>;
+  }
+
+
+
+  // Decline invite
+  Future<void> declineInvite({
+    required String inviteId,
+  }) async {
+    try {
+      await invitesCollection.doc(inviteId).update({
+        'status': 'declined',
+      });
+      print('Invite declined: $inviteId');
+    } catch (e) {
+      print('Error declining invite: $e');
+    }
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:savings_2/widgets/constants.dart';
 import '../authentication/auth_service.dart';
 import '../data/firebase_data.dart';
-import 'invitationgenerator.dart'; // Import your InvitationPage
 
 class BoardEntry{
   final String name;

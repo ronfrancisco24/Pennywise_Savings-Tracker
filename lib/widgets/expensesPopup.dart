@@ -19,7 +19,7 @@ Dialog expenseOutput(double amountSpent) {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
             Text('Amount spent: ', style: kNormalSansWhiteMini,),
-            Text('₽ ${amountSpent}', style: kNormalSansWhiteMini,),
+            Text('₱ ${amountSpent}', style: kNormalSansWhiteMini,),
           ],)
 
         ],

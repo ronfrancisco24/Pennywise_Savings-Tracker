@@ -505,7 +505,7 @@ class _AllocationPageState extends State<AllocationPage>
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '₽ 0.00',
+                                          '₱ 0.00',
                                           style: kMontserratWhiteLarge,
                                         ),
                                         Opacity(
@@ -551,7 +551,7 @@ class _AllocationPageState extends State<AllocationPage>
                                           style: kNormalSansWhiteMini,
                                         ),
                                         Text(
-                                          '₽0.00',
+                                          '₱0.00',
                                           style: kNormalSansWhiteSmall,
                                         ),
                                       ],
@@ -565,7 +565,7 @@ class _AllocationPageState extends State<AllocationPage>
                                           style: kNormalSansWhiteMini,
                                         ),
                                         Text(
-                                          '₽0.00',
+                                          '₱0.00',
                                           style: kNormalSansWhiteSmall,
                                         ),
                                       ],

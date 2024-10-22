@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/authentication/sign_in.dart';
 import 'package:savings_2/widgets/rightTrianglePainter.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 
 class SignUpPage extends StatefulWidget {
@@ -27,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
 
   Future<void> _registerUser() async {
-    // if password doesnt equal to confirm password, show error
+    // Check if password matches confirm password
     if (passwordController.text != confirmPwController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -38,22 +40,35 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     try {
-      UserCredential? userCredential =
-          await _auth.createUserWithEmailAndPassword(
-              email: emailController.text, password: passwordController.text);
+      // Create the user with email and password
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
 
+      // Update the display name
       await userCredential.user?.updateDisplayName(usernameController.text);
+
+      // Store additional user data in Firestore
+      await FirebaseFirestore.instance.collection('userData').doc(userCredential.user?.uid).set({
+        'username': usernameController.text,
+        'email': emailController.text,
+        // Add any other fields you want to store
+        'createdAt': FieldValue.serverTimestamp(), // Timestamp for when the account was created
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Registration Successful.'),
         ),
       );
+
+      // Optionally, navigate to another page after registration
+      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+
     } on FirebaseAuthException catch (e) {
       print(e.code);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Registration failed.'),
+          content: Text('Registration failed: ${e.message}'),
         ),
       );
     }

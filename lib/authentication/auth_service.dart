@@ -106,4 +106,18 @@ class AuthService {
       // Handle error (e.g., show an alert or snackbar)
     }
   }
+
+  Future<void> createUserInFirestore(String uid, String username) async {
+    try {
+      await _firestore.collection('userData').doc(uid).set({
+        'username': username,
+        'email': getCurrentUserEmail(),
+        // Add any other user info you want to store
+      });
+      print("User data stored in Firestore for UID: $uid");
+    } catch (e) {
+      print("Failed to store user data in Firestore: $e");
+    }
+  }
+
 }

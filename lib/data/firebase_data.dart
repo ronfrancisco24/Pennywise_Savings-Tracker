@@ -6,9 +6,12 @@ class FirebaseData {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference userData = FirebaseFirestore.instance.collection('userData');
-  final CollectionReference invitesCollection = FirebaseFirestore.instance
-      .doc(userID)
-      .collection('invitations');
+
+  late CollectionReference invitesCollection;
+
+  void setInvitesCollection(String userId){
+    invitesCollection = userData.doc(userId).collection('invitations');
+  }
 
   // ---------- Savings, Expenses, and Categories Logic  ----------
 
@@ -159,10 +162,15 @@ class FirebaseData {
   // Add invite to Firestore
   Future<void> sendFriendInvite({
     required String senderId,
-    required String recipientEmail, // Invitee's email
-    required String senderName, // Optional: so invitee can see who invited them
+    required String recipientEmail,
+    required String senderName,
   }) async {
     try {
+      // Ensure invitesCollection is set
+      if (invitesCollection == null) {
+        setInvitesCollection(senderId);  // Set the collection if not already set
+      }
+
       // Check if recipient exists in the database
       QuerySnapshot recipientSnapshot = await userData.where('email', isEqualTo: recipientEmail).get();
 
@@ -174,8 +182,8 @@ class FirebaseData {
         await invitesCollection.add({
           'senderId': senderId,
           'recipientId': recipientId,
-          'status': 'pending', // Pending by default
-          'timestamp': FieldValue.serverTimestamp(), // Track when the invite was sent
+          'status': 'pending',
+          'timestamp': FieldValue.serverTimestamp(),
         });
 
         print('Invite sent to: $recipientEmail');
@@ -183,7 +191,7 @@ class FirebaseData {
         print('Error: No user found with email $recipientEmail');
       }
     } catch (e) {
-      print('Error sending invite: $e');
+      print('Error sending invite: ${e.toString()}');
     }
   }
 

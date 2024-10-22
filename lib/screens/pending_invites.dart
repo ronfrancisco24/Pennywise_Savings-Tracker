@@ -27,6 +27,9 @@ class _PendingInvitesScreenState extends State<PendingInvitesScreen> {
       setState(() {
         userId = currentUser.uid; // Fetch and store the userId
       });
+
+      // Set invites collection after getting the userId
+      firebaseData.setInvitesCollection(userId!);
     }
   }
 

@@ -235,7 +235,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               SizedBox(width: 10),
                               Text(
-                                'Share',
+                                'Add Friends',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,

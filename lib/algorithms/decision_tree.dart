@@ -12,7 +12,6 @@ class DecisionTree {
     // If spending is on target or within the budget
     return 'Maintain Current Budget';
   }
-
 }
 
 //TODO: if one condition is true, we return some kind of dialog to show..

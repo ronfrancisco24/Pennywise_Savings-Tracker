@@ -146,7 +146,6 @@ void main() {
   print('Initial Daily Goals: ${calculator.dailySavings}');
   print('Initial Daily Budgets: ${calculator.dailyBudgets}');
   print('Initial Total Saved: ${calculator.totalSaved}');
-
   // Simulate expenses
   calculator.addExpense('001', 'Coffee', 43, 0); // day 1
   calculator.addExpense('001', 'Coffee', 100, 0); // day 1

@@ -1,10 +1,10 @@
-# savings_2
+# Pennywise Savings Tracker
 
 A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a savings tracker that helps users keep track of their funds and reach their savings goal.
 
 A few resources to get you started if this is your first Flutter project:
 

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:savings_2/algorithms/coin_change.dart';
-import 'package:savings_2/screens/allocation.dart';
 import 'package:savings_2/widgets/constants.dart';
 import 'package:savings_2/authentication/auth_service.dart';
 import 'package:savings_2/data/firebase_data.dart';
@@ -196,8 +195,7 @@ class _TrackerPageState extends State<TrackerPage>
                             Row(
                               children: [
                                 Expanded(
-                                  child: TextButton(
-                                    onPressed: () {},
+                                  child: SizedBox(
                                     child: Container(
                                       height: 50,
                                       decoration: kGradientColors,
@@ -205,32 +203,6 @@ class _TrackerPageState extends State<TrackerPage>
                                         child: Text(
                                           'Personal',
                                           style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AllocationPage()),
-                                      );
-                                    },
-                                    child: Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xffb1d4e0),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Budget Allocator',
-                                          style: TextStyle(color: Colors.black),
                                         ),
                                       ),
                                     ),
